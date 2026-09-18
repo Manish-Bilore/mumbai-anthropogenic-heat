@@ -1,0 +1,171 @@
+# =====================================================================
+# Mumbai anthropogenic heat / UBEM demo - ALL placeholders live here.
+# Every number below is provisional. Replace with measured/licensed data.
+# Provenance tags: [placeholder] [literature] [official]
+# =====================================================================
+
+run:
+  name: "mumbai_qf_demo"
+  seed: 42
+  scope_note: "Greater Mumbai (24 BMC wards). Excludes Thane, Navi Mumbai."
+
+crs:
+  working: "EPSG:32643"     # UTM 43N - metres, for areas
+  output: "EPSG:4326"
+
+paths:
+  buildings_raw: "data/raw/buildings.gpkg"     # or .gpkg
+  wards_raw: "data/raw/wards.gpkg"
+  ward_population: "data/raw/mumbai_ward_population_2023.csv"
+  weather: "data/raw/weather_typical_day.csv"
+  rr_rates: "data/raw/ready_reckoner.csv"         # optional income proxy
+  stock: "data/interim/stock.parquet"
+  stock_pop: "data/interim/stock_population.parquet"
+  loads: "data/processed/building_loads.parquet"
+  grid: "data/processed/qf_grid.parquet"
+  grid_geojson: "data/processed/qf_grid.geojson"
+  abm: "data/processed/qf_grid_penetration.parquet"
+  abm_geojson: "data/processed/qf_grid_penetration.geojson"
+
+schema:
+  # expected columns in the raw building file
+  building_id: "building_id"
+  height: "height_m"
+  use_class: "use_class"
+  slum_flag: "is_slum"        # optional; missing -> False
+
+stock:
+  floor_height_m:             # [placeholder]
+    residential: 3.0
+    commercial: 3.5
+    industrial: 6.0
+    default: 3.1
+  min_floors: 1
+  max_floors: 90              # sanity clip
+  # map raw Overture-derived use classes -> model archetypes
+  use_class_map:              # [placeholder]
+    residential: "res_midrise"
+    "mixed use": "res_midrise"
+    "commercial/retail": "com_retail"
+    commercial: "com_retail"
+    retail: "com_retail"
+    office: "com_office"
+    industrial: "industrial"
+    educational: "institutional"
+    health: "institutional"
+    religious: "institutional"
+    transport: "institutional"
+    unknown: "res_midrise"
+  # refine residential archetype by floor count
+  residential_by_floors:      # [placeholder]
+    - {max_floors: 2,  archetype: "res_lowrise"}
+    - {max_floors: 7,  archetype: "res_midrise"}
+    - {max_floors: 90, archetype: "res_tower"}
+  slum_archetype: "res_slum"
+
+archetypes:
+  # dwelling_area_m2: floor area per household
+  # u_value: W/m2K envelope average | ach: air changes per hour
+  # base_w_per_m2: non-residential plug+lighting density
+  res_slum:
+    dwelling_area_m2: 15.0        # [placeholder]
+    u_value: 2.8                  # [placeholder] tin/asbestos roof, brick
+    ach: 2.0
+    occupants: 4.5
+    appliances: {lighting: 40, fan: 150, tv: 60, fridge: 0.25, plug: 30}   # W, fridge = duty-weighted kW share
+    ac_capacity_w_th: 3500
+  res_lowrise:
+    dwelling_area_m2: 30.0
+    u_value: 2.2
+    ach: 1.5
+    occupants: 4.2
+    appliances: {lighting: 60, fan: 225, tv: 90, fridge: 0.35, plug: 60}
+    ac_capacity_w_th: 5300
+  res_midrise:
+    dwelling_area_m2: 60.0
+    u_value: 1.9
+    ach: 1.0
+    occupants: 4.0
+    appliances: {lighting: 100, fan: 300, tv: 120, fridge: 0.45, plug: 150}
+    ac_capacity_w_th: 5300
+  res_tower:
+    dwelling_area_m2: 110.0
+    u_value: 2.4                  # [placeholder] glazed facades lose more
+    ach: 0.8
+    occupants: 3.6
+    appliances: {lighting: 150, fan: 300, tv: 150, fridge: 0.55, plug: 250}
+    ac_capacity_w_th: 10600
+  com_retail:
+    base_w_per_m2: 25.0           # [placeholder]
+    u_value: 2.2
+    ach: 1.5
+    ac_fraction_fixed: 0.7        # commercial AC share is NOT set by the ABM
+  com_office:
+    base_w_per_m2: 35.0
+    u_value: 2.4
+    ach: 1.0
+    ac_fraction_fixed: 0.9
+  institutional:
+    base_w_per_m2: 15.0
+    u_value: 2.0
+    ach: 1.2
+    ac_fraction_fixed: 0.3
+  industrial:
+    base_w_per_m2: 40.0           # [placeholder] process load NOT modelled
+    u_value: 2.5
+    ach: 2.0
+    ac_fraction_fixed: 0.1
+
+schedules:                       # 24 hourly fractions, index 0 = 00:00 IST
+  residential_base:              # [placeholder]
+    [0.35,0.30,0.28,0.28,0.30,0.40,0.60,0.75,0.70,0.55,0.50,0.50,
+     0.55,0.55,0.55,0.60,0.70,0.85,1.00,1.00,0.95,0.85,0.65,0.45]
+  commercial_base:
+    [0.15,0.15,0.15,0.15,0.15,0.20,0.35,0.55,0.85,1.00,1.00,1.00,
+     0.95,0.95,1.00,1.00,1.00,0.95,0.85,0.70,0.50,0.35,0.25,0.18]
+  residential_occupancy:         # drives AC runtime
+    [1.00,1.00,1.00,1.00,1.00,0.95,0.85,0.60,0.40,0.30,0.30,0.30,
+     0.35,0.35,0.35,0.40,0.50,0.65,0.80,0.90,0.95,1.00,1.00,1.00]
+  commercial_occupancy:
+    [0.05,0.05,0.05,0.05,0.05,0.10,0.25,0.50,0.85,1.00,1.00,1.00,
+     0.90,0.90,1.00,1.00,1.00,0.95,0.80,0.60,0.40,0.25,0.15,0.08]
+
+cooling:
+  setpoint_c: 24.0               # [official] BEE default setpoint
+  cop: 3.0                       # [placeholder] constant; real COP falls with ambient T
+  sensible_fraction: 1.0         # [placeholder] split units; cooling towers differ
+  solar_gain_w_per_m2_floor: 8.0 # [placeholder] crude clear-sky proxy, daytime only
+  internal_gain_fraction: 1.0    # base electricity converts to indoor heat 1:1
+
+population:
+  household_size_default: 4.2    # [placeholder]
+  use_archetype_occupants: true  # prefer per-archetype occupants when available
+
+income:
+  # ready reckoner rate is the preferred proxy; fallback = dwelling area quantiles
+  bands: 4
+  slum_forced_band: 0            # slums pinned to lowest band
+  ac_saturation_by_band:         # [placeholder] baseline AC ownership fraction
+    0: 0.02
+    1: 0.15
+    2: 0.45
+    3: 0.80
+
+abm:
+  penetration_levels: [0.10, 0.25, 0.40, 0.60, 0.90]   # city-wide residential AC fraction
+  peer_radius_m: 500
+  peer_weight: 0.3               # weight of neighbour adoption vs income rank
+  income_weight: 0.7
+
+grid:
+  cell_m: 100
+
+benchmark:
+  # Sailor et al. 2015 extrapolation for Mumbai (city scale, fec=0.08, 2010 IEA)
+  sailor_summer_peak_wm2: 40.07       # [literature]
+  sailor_summer_mean_wm2: 23.46       # [literature]
+  wrf_defaults_wm2: {commercial: 90, high_density_res: 50, low_density_res: 20}
+
+logging:
+  level: "INFO"
+  file: "logs/run.log"

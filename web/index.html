@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mumbai anthropogenic heat — demo</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pmtiles/3.0.6/index.js"></script>
+<style>
+  :root { --bg:#0f1115; --panel:#191c23; --text:#e8eaf0; --muted:#98a0b3; --accent:#ffb454; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--text);
+              font:14px/1.45 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  #map { position:absolute; inset:0; }
+  .panel { position:absolute; top:12px; left:12px; width:290px; max-width:calc(100vw - 24px);
+           background:var(--panel); border:1px solid #262b35; border-radius:10px; padding:14px 16px;
+           box-shadow:0 6px 24px rgba(0,0,0,.45); z-index:2; }
+  .panel h1 { font-size:15px; margin:0 0 2px; letter-spacing:.2px; }
+  .panel p.sub { margin:0 0 12px; color:var(--muted); font-size:12px; }
+  label { display:block; font-size:12px; color:var(--muted); margin:10px 0 4px; }
+  input[type=range] { width:100%; accent-color:var(--accent); }
+  .val { color:var(--accent); font-variant-numeric:tabular-nums; }
+  .legend { margin-top:14px; border-top:1px solid #262b35; padding-top:10px; font-size:12px; }
+  .swatch { display:inline-block; width:14px; height:10px; margin-right:6px; border-radius:2px; }
+  .note { margin-top:10px; font-size:11px; color:var(--muted); }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div class="panel">
+  <h1>Mumbai anthropogenic heat</h1>
+  <p class="sub">Typical summer day · placeholder parameters · uncalibrated</p>
+
+  <label>Hour (IST): <span class="val" id="hourLabel">15:00</span></label>
+  <input type="range" id="hour" min="0" max="23" value="15" step="1" />
+
+  <label>Residential AC penetration: <span class="val" id="penLabel">40%</span></label>
+  <input type="range" id="pen" min="0" max="4" value="2" step="1" />
+
+  <div class="legend" id="legend"></div>
+  <div class="note">Q<sub>f</sub> = base electricity + condenser rejection Q<sub>cool</sub>(1 + 1/COP).
+    Vehicles, metabolism and industrial process heat are not included.</div>
+</div>
+
+<script>
+const PEN_LEVELS = ["p10", "p25", "p40", "p60", "p90"];
+const PEN_TEXT   = ["10%", "25%", "40%", "60%", "90%"];
+const BREAKS = [0, 5, 10, 20, 40, 80];
+const COLORS = ["#2b2f3a", "#31527d", "#2f8f9d", "#a8c256", "#f2a541", "#d1495b"];
+
+const protocol = new pmtiles.Protocol();
+maplibregl.addProtocol("pmtiles", protocol.tile);
+
+const map = new maplibregl.Map({
+  container: "map",
+  style: {
+    version: 8,
+    sources: {
+      osm: { type: "raster", tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
+             tileSize: 256, attribution: "© OpenStreetMap contributors" }
+    },
+    layers: [{ id: "osm", type: "raster", source: "osm", paint: { "raster-brightness-max": 0.45, "raster-saturation": -0.7 } }]
+  },
+  center: [72.87, 19.08],
+  zoom: 11
+});
+
+function fillExpression(field) {
+  const expr = ["interpolate", ["linear"], ["coalesce", ["get", field], 0]];
+  BREAKS.forEach((b, i) => expr.push(b, COLORS[i]));
+  return expr;
+}
+
+function currentField() {
+  const h = String(document.getElementById("hour").value).padStart(2, "0");
+  const p = PEN_LEVELS[document.getElementById("pen").value];
+  return `${p}_h${h}`;
+}
+
+function refresh() {
+  const h = document.getElementById("hour").value;
+  document.getElementById("hourLabel").textContent = String(h).padStart(2, "0") + ":00";
+  document.getElementById("penLabel").textContent = PEN_TEXT[document.getElementById("pen").value];
+  if (map.getLayer("qf")) {
+    map.setPaintProperty("qf", "fill-color", fillExpression(currentField()));
+  }
+}
+
+map.on("load", () => {
+  map.addSource("qf", { type: "vector", url: "pmtiles://./tiles/qf_grid.pmtiles" });
+  map.addLayer({
+    id: "qf", type: "fill", source: "qf", "source-layer": "qf_grid",
+    paint: { "fill-color": fillExpression(currentField()), "fill-opacity": 0.75 }
+  });
+
+  map.on("click", "qf", (e) => {
+    const v = e.features[0].properties[currentField()];
+    new maplibregl.Popup().setLngLat(e.lngLat)
+      .setHTML(`<b>${Number(v).toFixed(1)} W/m²</b><br/>cell ${e.features[0].properties.cell_id}`)
+      .addTo(map);
+  });
+  refresh();
+});
+
+const legend = document.getElementById("legend");
+legend.innerHTML = "<div>Q<sub>f</sub> (W m<sup>-2</sup>)</div>" + BREAKS.map((b, i) =>
+  `<div><span class="swatch" style="background:${COLORS[i]}"></span>${b}${i === BREAKS.length - 1 ? "+" : "–" + BREAKS[i + 1]}</div>`
+).join("");
+
+document.getElementById("hour").addEventListener("input", refresh);
+document.getElementById("pen").addEventListener("input", refresh);
+</script>
+</body>
+</html>
