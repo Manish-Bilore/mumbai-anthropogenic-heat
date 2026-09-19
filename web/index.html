@@ -53,18 +53,29 @@
     discomfort and neighbours; waste heat feeds back as &Delta;T into the next year's
     cooling demand. Industrial process heat and daytime population movement are not modelled.
     <a href="https://github.com/Manish-Bilore/mumbai-anthropogenic-heat">source</a>
+    <span id="hash"></span>
   </div>
 </div>
 
 <script>
-const YEARS  = [2026, 2030, 2035, 2040];
-// from data/processed/abm_timeseries.csv (feedback_k = 0.05)
-const SERIES = {
-  2026: { pen: 20.0, hh: 0.65, qf: 22.21, peak: 35.12, dt: 0.00, mw: 3459 },
-  2030: { pen: 29.7, hh: 0.97, qf: 23.37, peak: 37.04, dt: 0.04, mw: 3610 },
-  2035: { pen: 47.1, hh: 1.54, qf: 25.49, peak: 40.50, dt: 0.14, mw: 3882 },
-  2040: { pen: 66.7, hh: 2.19, qf: 27.97, peak: 44.50, dt: 0.26, mw: 4229 }
-};
+let YEARS  = [2026, 2030, 2035, 2040];
+let SERIES = {};                       // filled from ./series.json (written by scripts/12)
+let META   = {};
+
+async function loadSeries() {
+  try {
+    const r = await fetch("./series.json", { cache: "no-store" });
+    if (!r.ok) throw new Error(r.status);
+    const j = await r.json();
+    YEARS = j.years;
+    SERIES = j.series;
+    META = j.meta || {};
+    document.getElementById("year").max = String(YEARS.length - 1);
+  } catch (e) {
+    console.warn("series.json unavailable; stats panel disabled", e);
+  }
+}
+
 const BREAKS = [0, 8, 15, 25, 40, 60];
 const COLORS = ["#2b2f3a", "#31527d", "#2f8f9d", "#a8c256", "#f2a541", "#d1495b"];
 
@@ -102,7 +113,8 @@ function refresh() {
   document.getElementById("yearLabel").textContent = y;
   document.getElementById("hourLabel").textContent = String(h).padStart(2, "0") + ":00";
 
-  const s = SERIES[y];
+  const s = SERIES[String(y)];
+  if (!s) { document.getElementById('stats').innerHTML = ''; return refreshLayer(); }
   document.getElementById("stats").innerHTML = `
     <div class="k">AC penetration</div><div class="v">${s.pen.toFixed(1)}%</div>
     <div class="k">households with AC</div><div class="v">${s.hh.toFixed(2)} M</div>
@@ -111,10 +123,15 @@ function refresh() {
     <div class="k">feedback ΔT</div><div class="v">+${s.dt.toFixed(2)} °C</div>
     <div class="k">peak electricity</div><div class="v">${s.mw.toLocaleString()} MW</div>`;
 
+  refreshLayer();
+}
+
+function refreshLayer() {
   if (map.getLayer("qf")) map.setPaintProperty("qf", "fill-color", fillExpr(field()));
 }
 
-map.on("load", () => {
+map.on("load", async () => {
+  await loadSeries();
   map.addSource("qf", { type: "vector", url: "pmtiles://./tiles/qf_years.pmtiles" });
   map.addLayer({
     id: "qf", type: "fill", source: "qf", "source-layer": "qf_years",
@@ -141,6 +158,12 @@ document.getElementById("legend").innerHTML =
   "<div>Q<sub>f</sub> (W m<sup>-2</sup>)</div>" +
   BREAKS.map((b, i) => `<div><span class="swatch" style="background:${COLORS[i]}"></span>` +
     `${b}${i === BREAKS.length - 1 ? "+" : "–" + BREAKS[i + 1]}</div>`).join("");
+
+loadSeries().then(() => {
+  refresh();
+  if (META.config_hash)
+    document.getElementById("hash").textContent = " · config " + META.config_hash;
+});
 
 document.getElementById("year").addEventListener("input", refresh);
 document.getElementById("hour").addEventListener("input", refresh);

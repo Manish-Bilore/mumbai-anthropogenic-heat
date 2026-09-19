@@ -1,0 +1,74 @@
+{
+  "years": [
+    2026,
+    2030,
+    2035,
+    2040
+  ],
+  "series": {
+    "2026": {
+      "pen": 17.9,
+      "hh": 0.58,
+      "qf": 20.58,
+      "peak": 32.3,
+      "dt": 0.0,
+      "mw": 3064,
+      "runtime": 0.6
+    },
+    "2030": {
+      "pen": 24.9,
+      "hh": 0.8,
+      "qf": 21.18,
+      "peak": 33.37,
+      "dt": 0.02,
+      "mw": 3148,
+      "runtime": 0.6
+    },
+    "2035": {
+      "pen": 38.3,
+      "hh": 1.23,
+      "qf": 22.34,
+      "peak": 35.42,
+      "dt": 0.07,
+      "mw": 3309,
+      "runtime": 0.6
+    },
+    "2040": {
+      "pen": 56.2,
+      "hh": 1.81,
+      "qf": 23.81,
+      "peak": 38.06,
+      "dt": 0.15,
+      "mw": 3516,
+      "runtime": 0.61
+    }
+  },
+  "meta": {
+    "config_hash": "9b54465b8e45",
+    "households_total": 3223052,
+    "feedback_k": 0.05,
+    "note": "uncalibrated prototype; see README known-wrong list"
+  },
+  "thermal_by_band": [
+    {
+      "income_band": 0,
+      "t_in_mean": 32.0,
+      "discomfort": 21335.1
+    },
+    {
+      "income_band": 1,
+      "t_in_mean": 31.1,
+      "discomfort": 16576.1
+    },
+    {
+      "income_band": 2,
+      "t_in_mean": 31.1,
+      "discomfort": 16603.1
+    },
+    {
+      "income_band": 3,
+      "t_in_mean": 31.0,
+      "discomfort": 16235.7
+    }
+  ]
+}
