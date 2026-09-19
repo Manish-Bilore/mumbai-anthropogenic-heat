@@ -1,38 +1,140 @@
 /*-- scss:defaults --*/
-$primary:        #b3541e;
-$body-color:     #1f2430;
-$link-color:     #b3541e;
-$font-family-sans-serif: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-$font-size-root: 16px;
-$h1-font-size:   2.0rem;
-$h2-font-size:   1.45rem;
+// Mumbai Heat editorial system — shared with story/index.html and web/heat.css.
+$ink:    #171716;
+$paper:  #f4f0e8;
+$sand:   #d9cbb5;
+$stone:  #6a6357;
+$h1c:    #762b25;
+$h2c:    #c84630;
+$h3c:    #e76f32;
+$h4c:    #f2c14e;
+$sea:    #277c78;
+
+$body-bg:        $paper;
+$body-color:     $ink;
+$primary:        $h1c;
+$link-color:     $h1c;
+$link-hover-color: $h2c;
+$code-color:     $h1c;
+$border-color:   rgba(23, 23, 22, 0.14);
+
+$font-family-sans-serif: "Newsreader", "Iowan Old Style", Georgia, serif;
+$headings-font-family:   "Newsreader", Georgia, serif;
+$font-family-monospace:  "IBM Plex Mono", ui-monospace, Menlo, monospace;
+$headings-font-weight:   400;
+$font-size-root: 18px;
+$line-height-base: 1.6;
+$h1-font-size:   2.6rem;
+$h2-font-size:   1.7rem;
+$h3-font-size:   1.25rem;
+
+$navbar-bg: $ink;
+$navbar-fg: #b9ae9c;
+$navbar-hl: $paper;
+$footer-bg: $ink;
+$footer-fg: #b9ae9c;
+$toc-color: $stone;
+$toc-active-border: $h2c;
 
 /*-- scss:rules --*/
-.navbar { border-bottom: 1px solid #e6e3dd; }
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..500&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap");
 
-.hero {
-  padding: 1.6rem 1.8rem;
-  margin: 0 0 2rem;
-  background: linear-gradient(135deg, #fbf6ef 0%, #f3ece2 100%);
-  border-left: 4px solid $primary;
-  border-radius: 4px;
+$sans: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+$mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+
+body { -webkit-font-smoothing: antialiased; }
+::selection { background: $h4c; color: $ink; }
+
+/* chrome in the grotesk, reading in the serif */
+.navbar, .sidebar, #TOC, #toc-title, .nav-footer, .quarto-title-meta, .quarto-title-meta-heading,
+table, figcaption, .callout, .code-tools-button, .quarto-alternate-formats, button, input {
+  font-family: $sans;
 }
-.hero p { margin-bottom: 0.4rem; }
+
+.navbar {
+  border-bottom: 1px solid rgba(244, 240, 232, 0.14);
+  .navbar-brand, .navbar-title {
+    font: 700 13px/1 $sans !important; letter-spacing: .16em; text-transform: uppercase; color: $paper !important;
+  }
+  .nav-link {
+    font: 500 10.5px/1 $mono; letter-spacing: .08em; text-transform: uppercase;
+    &.active { color: $paper !important; box-shadow: inset 0 -2px 0 $h3c; }
+  }
+}
+
+.quarto-title-block .quarto-title-banner { background: none; }
+h1.title, .quarto-title h1 {
+  font-weight: 350; letter-spacing: -.02em; line-height: 1.02; font-size: clamp(2.2rem, 4.4vw, 3.4rem);
+  font-variation-settings: "opsz" 72;
+}
+.subtitle { font-style: italic; color: $stone; font-size: 1.25rem; }
+h2 {
+  font-weight: 400; letter-spacing: -.01em; margin-top: 2.6rem;
+  border-bottom: 0; padding-bottom: 0;
+  &::before { content: ""; display: block; width: 36px; height: 2px; background: $h2c; margin-bottom: .9rem; }
+}
+h3 { font-weight: 500; }
+a { text-underline-offset: 3px; text-decoration-thickness: 1px; }
+
+#TOC, .sidebar nav[role="doc-toc"] {
+  #toc-title { font: 500 10.5px $mono; letter-spacing: .14em; text-transform: uppercase; color: $stone; }
+  a { font-size: 13.5px; }
+}
+
+/* numbers stay tabular everywhere */
+table, .keynum, code { font-variant-numeric: tabular-nums lining-nums; }
+table {
+  font-size: 14px;
+  thead th { font: 500 10.5px/1.3 $mono; letter-spacing: .08em; text-transform: uppercase; color: $stone;
+             border-bottom: 1px solid $ink !important; }
+  td, th { border-color: rgba(23, 23, 22, 0.12) !important; }
+}
+code { background: rgba(217, 203, 181, .35); padding: .08em .3em; border-radius: 2px; }
+pre, div.sourceCode { background: #ebe5d9 !important; border: 0; border-left: 2px solid $h2c; border-radius: 0; }
+
+/* overview page blocks (overview.qmd) */
+.hero {
+  padding: 1.6rem 0 1.4rem;
+  margin: 0 0 2rem;
+  background: none;
+  border-top: 2px solid $ink;
+  border-bottom: 1px solid $border-color;
+  font-size: 1.28rem; line-height: 1.5;
+}
+.hero p { margin-bottom: 0.6rem; }
 
 .keynum {
-  display: flex; flex-wrap: wrap; gap: 1.2rem; margin: 1.5rem 0 2rem;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0; margin: 1.5rem 0 2.4rem;
+  border-top: 1px solid $border-color;
 }
-.keynum > div {
-  flex: 1 1 150px; padding: 0.9rem 1.1rem;
-  background: #fbf9f6; border: 1px solid #e6e3dd; border-radius: 4px;
-}
-.keynum .v { font-size: 1.5rem; font-weight: 600; color: $primary; line-height: 1.1; }
-.keynum .k { font-size: 0.8rem; color: #6b7280; margin-top: 0.25rem; }
+.keynum > div { padding: .9rem 1rem .4rem 0; background: none; border: 0; }
+.keynum > div + div { padding-left: 1rem; border-left: 1px solid $border-color; }
+.keynum .v { font-size: 1.3rem; font-weight: 400; color: $h1c; line-height: 1.1; }
+.keynum .k { font: 500 12px/1.4 $sans; color: $stone; margin-top: 0.35rem; }
 
 .caveat {
-  border-left: 3px solid #d1495b; background: #fdf4f5;
-  padding: 0.8rem 1.1rem; margin: 1.4rem 0; font-size: 0.93rem;
+  border: 1px solid $h4c; background: $ink; color: $sand;
+  padding: 1rem 1.2rem; margin: 1.6rem 0; font: 400 15px/1.55 $sans;
+  strong { color: $paper; }
+  a { color: $h4c; }
+  &::before {
+    content: "Uncalibrated prototype"; display: block; margin-bottom: .6rem;
+    font: 500 10.5px $mono; letter-spacing: .1em; text-transform: uppercase; color: $h4c;
+  }
 }
 
-table { font-size: 0.92rem; }
-figure figcaption { color: #6b7280; font-size: 0.85rem; }
+.callout { border-radius: 0; }
+figure figcaption { color: $stone; font-size: 13px; }
+.cell-output-display img { mix-blend-mode: multiply; }
+
+.nav-footer {
+  font-size: 12.5px; border-top: 1px solid rgba(244, 240, 232, .14);
+  a { color: $footer-fg; }
+}
+
+/* a return path to the story on every document page */
+.story-link {
+  display: inline-block; font: 600 12px $sans; background: $ink; color: $paper !important;
+  padding: .55rem .8rem; text-decoration: none;
+  &:hover { background: $h1c; }
+}

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>The agent-based model – Mumbai Anthropogenic Heat</title>
+<title>Overview – Mumbai Anthropogenic Heat</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -109,35 +109,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 </head>
 
@@ -163,7 +134,7 @@ window.Quarto = {
 <span class="menu-text">Story</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./overview.html"> 
+    <a class="nav-link active" href="./overview.html" aria-current="page"> 
 <span class="menu-text">Overview</span></a>
   </li>  
   <li class="nav-item">
@@ -171,7 +142,7 @@ window.Quarto = {
 <span class="menu-text">Method</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./abm.html" aria-current="page"> 
+    <a class="nav-link" href="./abm.html"> 
 <span class="menu-text">The ABM</span></a>
   </li>  
   <li class="nav-item">
@@ -217,20 +188,19 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#why-agents" id="toc-why-agents" class="nav-link active" data-scroll-target="#why-agents">Why agents</a></li>
-  <li><a href="#agents" id="toc-agents" class="nav-link" data-scroll-target="#agents">Agents</a></li>
-  <li><a href="#the-decision" id="toc-the-decision" class="nav-link" data-scroll-target="#the-decision">The decision</a></li>
-  <li><a href="#operation" id="toc-operation" class="nav-link" data-scroll-target="#operation">Operation</a></li>
-  <li><a href="#what-the-model-is-not" id="toc-what-the-model-is-not" class="nav-link" data-scroll-target="#what-the-model-is-not">What the model is not</a></li>
+  <li><a href="#what-this-is" id="toc-what-this-is" class="nav-link active" data-scroll-target="#what-this-is">What this is</a></li>
+  <li><a href="#what-it-shows" id="toc-what-it-shows" class="nav-link" data-scroll-target="#what-it-shows">What it shows</a></li>
+  <li><a href="#built-in-a-day" id="toc-built-in-a-day" class="nav-link" data-scroll-target="#built-in-a-day">Built in a day</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/Manish-Bilore/mumbai-anthropogenic-heat/blob/main/abm.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/Manish-Bilore/mumbai-anthropogenic-heat/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/Manish-Bilore/mumbai-anthropogenic-heat/blob/main/overview.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/Manish-Bilore/mumbai-anthropogenic-heat/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title">The agent-based model</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+<div class="quarto-title-block"><div><h1 class="title">Anthropogenic heat and air-conditioner adoption in Greater Mumbai</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+<p class="subtitle lead">A bottom-up urban building energy model coupled to a household agent-based model</p>
 </div>
 
 
@@ -247,231 +217,42 @@ window.Quarto = {
 </header>
 
 
-<section id="why-agents" class="level2">
-<h2 class="anchored" data-anchor-id="why-agents">Why agents</h2>
-<p>A spreadsheet can multiply an assumed penetration rate by a cooling load. Three things here need agents:</p>
-<p><strong>Heterogeneity that interacts with the physics.</strong> The dwelling that gets hottest belongs to the household least able to buy cooling. That correlation determines the aggregate, and it cannot be recovered from city means.</p>
-<p><strong>Peer effects.</strong> Adoption spreads through neighbourhoods. The share of nearby households already owning an AC enters each decision, so adoption compounds spatially instead of rising uniformly.</p>
-<p><strong>A feedback loop.</strong> Waste heat raises outdoor temperature, which raises indoor temperature, which raises discomfort, which raises adoption. The loop only exists if the agents re-read their environment each year.</p>
-</section>
-<section id="agents" class="level2">
-<h2 class="anchored" data-anchor-id="agents">Agents</h2>
-<p>One household cohort per residential building: an integer count of households, of which an integer count own an air conditioner. That makes 3.2 million household agents cost two integer arrays rather than three million Python objects.</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 50%">
-<col style="width: 50%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>attribute</th>
-<th>source</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>households</td>
-<td>ward population → residential floor area → archetype occupancy</td>
-</tr>
-<tr class="even">
-<td>income band</td>
-<td>ready-reckoner quartile, slums pinned to the lowest</td>
-</tr>
-<tr class="odd">
-<td>archetype</td>
-<td>typology + floor count + slum flag</td>
-</tr>
-<tr class="even">
-<td>indoor temperature, discomfort</td>
-<td>1R1C model on that building’s fabric</td>
-</tr>
-<tr class="odd">
-<td>AC ownership</td>
-<td>state variable, updated annually</td>
-</tr>
-<tr class="even">
-<td>setpoint, runtime</td>
-<td>chosen from income band and indoor exceedance</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="the-decision" class="level2">
-<h2 class="anchored" data-anchor-id="the-decision">The decision</h2>
-<p>Each year, every household without an AC draws against</p>
-<p><span class="math display">\[
-u = \beta_0 + \beta_a (\text{afford} - 1) + \beta_d \left(\frac{\text{discomfort}_i}{\text{discomfort}_\text{ref}} - 1\right) + \beta_p\, \text{peer}_i
-\]</span></p>
-<p><span class="math display">\[
-p_i = \frac{p_\text{cap}}{1 + e^{-u}}
-\]</span></p>
-<ul>
-<li><strong>afford</strong> rises with real income growth against a falling real AC price, scaled down at low income bands (the same price is a larger barrier further down the distribution).</li>
-<li><strong>discomfort<sub>i</sub></strong> is that agent’s own indoor degree-hours above the comfort threshold, including any warming the city has caused itself.</li>
-<li><strong>peer<sub>i</sub></strong> is the share of households owning an AC within the agent’s neighbourhood, computed on a 500 m grid with 3×3 smoothing rather than a radius query — the calculation repeats every simulated year over 580,890 buildings.</li>
-</ul>
-<p>Adoption is a binomial draw on the non-owning households, so <strong>penetration is an output</strong>. Nothing forces the trajectory toward a target.</p>
-</section>
-<section id="operation" class="level2">
-<h2 class="anchored" data-anchor-id="operation">Operation</h2>
-<p>Ownership is a weak proxy for heat output: a household cooling one room for two hours a night and one cooling a whole flat for ten differ fourfold. Two behavioural variables close that gap.</p>
-<p><strong>Setpoint</strong> falls with income band (27 °C at the bottom, 24 °C at the top). <strong>Runtime</strong> is logistic in mean indoor exceedance above the setpoint, damped by a bill sensitivity that is lower for poorer households. Both are read back by the load model.</p>
-<div id="2b72777d" class="cell" data-execution_count="1">
+<div class="hero">
+<p>Every air conditioner moves heat from inside a building to the street. As Mumbai’s households buy them, the city’s waste heat rises — and the households least able to afford cooling live in the dwellings that get hottest.</p>
+<p>This project quantifies both halves of that sentence for all 580,890 buildings inside the 24 BMC wards.</p>
+</div>
+<p><a href="index.html" class="story-link">← The visual story</a> &nbsp; <a href="map/index.html" class="story-link">Explore the map →</a></p>
+<div id="7bac4640" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div>
 
-
-<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">penetration %</th>
-<th data-quarto-table-cell-role="th">mean runtime</th>
-<th data-quarto-table-cell-role="th">Qf mean W/m²</th>
-<th data-quarto-table-cell-role="th">ΔT °C</th>
-<th data-quarto-table-cell-role="th">peak MW</th>
-</tr>
-<tr class="even">
-<th data-quarto-table-cell-role="th">year</th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<th data-quarto-table-cell-role="th">2026</th>
-<td>17.9</td>
-<td>0.60</td>
-<td>20.58</td>
-<td>0.00</td>
-<td>3064</td>
-</tr>
-<tr class="even">
-<th data-quarto-table-cell-role="th">2027</th>
-<td>19.4</td>
-<td>0.60</td>
-<td>20.70</td>
-<td>0.00</td>
-<td>3081</td>
-</tr>
-<tr class="odd">
-<th data-quarto-table-cell-role="th">2028</th>
-<td>21.1</td>
-<td>0.60</td>
-<td>20.84</td>
-<td>0.01</td>
-<td>3101</td>
-</tr>
-<tr class="even">
-<th data-quarto-table-cell-role="th">2029</th>
-<td>22.9</td>
-<td>0.60</td>
-<td>21.00</td>
-<td>0.01</td>
-<td>3123</td>
-</tr>
-<tr class="odd">
-<th data-quarto-table-cell-role="th">2030</th>
-<td>24.9</td>
-<td>0.60</td>
-<td>21.18</td>
-<td>0.02</td>
-<td>3148</td>
-</tr>
-<tr class="even">
-<th data-quarto-table-cell-role="th">2031</th>
-<td>27.1</td>
-<td>0.60</td>
-<td>21.37</td>
-<td>0.03</td>
-<td>3175</td>
-</tr>
-<tr class="odd">
-<th data-quarto-table-cell-role="th">2032</th>
-<td>29.6</td>
-<td>0.60</td>
-<td>21.58</td>
-<td>0.04</td>
-<td>3204</td>
-</tr>
-<tr class="even">
-<th data-quarto-table-cell-role="th">2033</th>
-<td>32.2</td>
-<td>0.60</td>
-<td>21.81</td>
-<td>0.05</td>
-<td>3237</td>
-</tr>
-<tr class="odd">
-<th data-quarto-table-cell-role="th">2034</th>
-<td>35.1</td>
-<td>0.60</td>
-<td>22.07</td>
-<td>0.06</td>
-<td>3272</td>
-</tr>
-<tr class="even">
-<th data-quarto-table-cell-role="th">2035</th>
-<td>38.3</td>
-<td>0.60</td>
-<td>22.34</td>
-<td>0.07</td>
-<td>3309</td>
-</tr>
-<tr class="odd">
-<th data-quarto-table-cell-role="th">2036</th>
-<td>41.6</td>
-<td>0.60</td>
-<td>22.62</td>
-<td>0.09</td>
-<td>3349</td>
-</tr>
-<tr class="even">
-<th data-quarto-table-cell-role="th">2037</th>
-<td>45.1</td>
-<td>0.60</td>
-<td>22.92</td>
-<td>0.10</td>
-<td>3390</td>
-</tr>
-<tr class="odd">
-<th data-quarto-table-cell-role="th">2038</th>
-<td>48.7</td>
-<td>0.60</td>
-<td>23.22</td>
-<td>0.12</td>
-<td>3432</td>
-</tr>
-<tr class="even">
-<th data-quarto-table-cell-role="th">2039</th>
-<td>52.4</td>
-<td>0.61</td>
-<td>23.51</td>
-<td>0.13</td>
-<td>3475</td>
-</tr>
-<tr class="odd">
-<th data-quarto-table-cell-role="th">2040</th>
-<td>56.2</td>
-<td>0.61</td>
-<td>23.81</td>
-<td>0.15</td>
-<td>3516</td>
-</tr>
-</tbody>
-</table>
-
+<div class="keynum">
+  <div><div class="v">20.58 W/m²</div><div class="k">Q<sub>f</sub> mean over built cells, 2026</div></div>
+  <div><div class="v">17.9% → 56.2%</div><div class="k">AC penetration, 2026 → 2040</div></div>
+  <div><div class="v">23.81 W/m²</div><div class="k">Q<sub>f</sub> mean, 2040</div></div>
+  <div><div class="v">+0.15 °C</div><div class="k">waste-heat feedback by 2040</div></div>
+  <div><div class="v">3,064 → 3,516 MW</div><div class="k">peak electricity</div></div>
 </div>
 </div>
 </div>
-<p>The city-wide mean runtime is where the inequality shows up in aggregate: it dropped from 0.74 to 0.60 the moment 284,216 buildings were reclassified as informal, because those households sit in the highest-setpoint, most bill-sensitive group. Operation behaviour, not ownership, did that.</p>
+<section id="what-this-is" class="level2">
+<h2 class="anchored" data-anchor-id="what-this-is">What this is</h2>
+<p>Two models, coupled.</p>
+<p><strong>A bottom-up urban building energy model.</strong> Building footprints and heights become a stock of typed archetypes. Each carries an appliance load and a cooling load driven by outdoor temperature, and each rejects waste heat to the street: base electricity roughly one-to-one, plus condenser heat of Q<sub>cool</sub>(1 + 1/COP). Human metabolism and road traffic are added, and the total is aggregated to a 100 m grid at hourly resolution.</p>
+<p><strong>An agent-based model of who buys an air conditioner.</strong> Households are agents. Each year, every household without an AC decides whether to buy one, based on what it can afford, how hot its own dwelling gets, and how many of its neighbours already have one. Those that own one choose a setpoint and how long to run it. The resulting waste heat raises the city’s temperature, which raises next year’s discomfort — the loop that makes this an ABM rather than a projection.</p>
 </section>
-<section id="what-the-model-is-not" class="level2">
-<h2 class="anchored" data-anchor-id="what-the-model-is-not">What the model is not</h2>
-<p>It has no replacement cycle (units are bought, never retired), no explicit tariff slabs, no tenure split between owners and renters, and no change in the building stock — no redevelopment, no new construction, no population growth. Commercial and industrial cooling is a fixed fraction per archetype and sits outside the ABM entirely, despite being 43% of modelled energy.</p>
+<section id="what-it-shows" class="level2">
+<h2 class="anchored" data-anchor-id="what-it-shows">What it shows</h2>
+<p><strong>The city-scale magnitude checks out.</strong> Q<sub>f</sub> over built cells comes to 20.58 W/m² against 23.5 W/m² from the published extrapolation for Mumbai, but peaks at 18:00 rather than 16:00. That two-hour gap is the substantive result: the benchmark’s diurnal shape comes from US utility load curves, while Indian residential demand peaks in the evening.</p>
+<p><strong>Adoption roughly triples by 2040</strong>, adding 3.2 W/m² of waste heat and 452 MW of peak demand, with no population growth or new construction in the model.</p>
+<p><strong>Thermal inequality is measurable and it runs the wrong way.</strong> Informal dwellings sit 1.6 °C hotter on average and 4.0 °C hotter at peak than tower flats, carry 65% more discomfort degree-hours, and run cooling at 64% of the rate. The heat they are exposed to outdoors is produced largely by other people’s machines.</p>
+<p><strong>The two mechanisms are separable.</strong> Sensitivity screening puts affordability and the baseline purchase rate at the top and indoor discomfort near the bottom for adoption, while discomfort produces the largest spread across the stock. Income and price decide <em>who adopts</em>; building fabric decides <em>who suffers while not adopting</em>.</p>
+<div class="caveat">
+<p><strong>This is an uncalibrated prototype.</strong> The building physics and the agent logic are real; the behavioural coefficients are not fitted to observation, and the two that dominate the result have no empirical anchor. Treat trajectories as structural, not predictive. See <a href="./limitations.html">Limits</a>.</p>
+</div>
+</section>
+<section id="built-in-a-day" class="level2">
+<h2 class="anchored" data-anchor-id="built-in-a-day">Built in a day</h2>
+<p>The whole pipeline — data assembly, energy model, thermal model, ABM, sensitivity screening, web map — was built in a single session on 19 September 2026, then paused for documentation. <a href="./reproduce.html">Reproduce</a> has the commands.</p>
 
 
 <!-- -->
@@ -936,99 +717,88 @@ p_i = \frac{p_\text{cap}}{1 + e^{-u}}
   });
   </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "The agent-based model"</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">## Why agents</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Anthropogenic heat and air-conditioner adoption in Greater Mumbai"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="an">pagetitle:</span><span class="co"> "Overview"</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "A bottom-up urban building energy model coupled to a household agent-based model"</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>A spreadsheet can multiply an assumed penetration rate by a cooling load. Three things</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>here need agents:</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>**Heterogeneity that interacts with the physics.** The dwelling that gets hottest belongs</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>to the household least able to buy cooling. That correlation determines the aggregate, and</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>it cannot be recovered from city means.</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>**Peer effects.** Adoption spreads through neighbourhoods. The share of nearby households</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>already owning an AC enters each decision, so adoption compounds spatially instead of</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>rising uniformly.</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>::: {.hero}</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>Every air conditioner moves heat from inside a building to the street. As Mumbai's</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>households buy them, the city's waste heat rises — and the households least able to</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>afford cooling live in the dwellings that get hottest.</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>This project quantifies both halves of that sentence for all 580,890 buildings inside</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>the 24 BMC wards.</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">← The visual story</span><span class="co">](index.html)</span>{.story-link} <span class="dv">&amp;nbsp;</span> <span class="co">[</span><span class="ot">Explore the map →</span><span class="co">](map/index.html)</span>{.story-link}</span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>**A feedback loop.** Waste heat raises outdoor temperature, which raises indoor</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>temperature, which raises discomfort, which raises adoption. The loop only exists if the</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>agents re-read their environment each year.</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="fu">## Agents</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>One household cohort per residential building: an integer count of households, of which an</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>integer count own an air conditioner. That makes 3.2 million household agents cost two</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>integer arrays rather than three million Python objects.</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> attribute <span class="pp">|</span> source <span class="pp">|</span></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> households <span class="pp">|</span> ward population → residential floor area → archetype occupancy <span class="pp">|</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> income band <span class="pp">|</span> ready-reckoner quartile, slums pinned to the lowest <span class="pp">|</span></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> archetype <span class="pp">|</span> typology + floor count + slum flag <span class="pp">|</span></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> indoor temperature, discomfort <span class="pp">|</span> 1R1C model on that building's fabric <span class="pp">|</span></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> AC ownership <span class="pp">|</span> state variable, updated annually <span class="pp">|</span></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> setpoint, runtime <span class="pp">|</span> chosen from income band and indoor exceedance <span class="pp">|</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json, pathlib</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> json.loads(pathlib.Path(<span class="st">"web/series.json"</span>).read_text())</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>a, b <span class="op">=</span> s[<span class="st">"series"</span>][<span class="st">"2026"</span>], s[<span class="st">"series"</span>][<span class="st">"2040"</span>]</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> IPython.display <span class="im">import</span> HTML</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>HTML(<span class="ss">f"""</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="ss">&lt;div class="keynum"&gt;</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="ss">  &lt;div&gt;&lt;div class="v"&gt;</span><span class="sc">{</span>a[<span class="st">'qf'</span>]<span class="sc">}</span><span class="ss"> W/m²&lt;/div&gt;&lt;div class="k"&gt;Q&lt;sub&gt;f&lt;/sub&gt; mean over built cells, 2026&lt;/div&gt;&lt;/div&gt;</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="ss">  &lt;div&gt;&lt;div class="v"&gt;</span><span class="sc">{</span>a[<span class="st">'pen'</span>]<span class="sc">}</span><span class="ss">% → </span><span class="sc">{</span>b[<span class="st">'pen'</span>]<span class="sc">}</span><span class="ss">%&lt;/div&gt;&lt;div class="k"&gt;AC penetration, 2026 → 2040&lt;/div&gt;&lt;/div&gt;</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="ss">  &lt;div&gt;&lt;div class="v"&gt;</span><span class="sc">{</span>b[<span class="st">'qf'</span>]<span class="sc">}</span><span class="ss"> W/m²&lt;/div&gt;&lt;div class="k"&gt;Q&lt;sub&gt;f&lt;/sub&gt; mean, 2040&lt;/div&gt;&lt;/div&gt;</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="ss">  &lt;div&gt;&lt;div class="v"&gt;+</span><span class="sc">{</span>b[<span class="st">'dt'</span>]<span class="sc">}</span><span class="ss"> °C&lt;/div&gt;&lt;div class="k"&gt;waste-heat feedback by 2040&lt;/div&gt;&lt;/div&gt;</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="ss">  &lt;div&gt;&lt;div class="v"&gt;</span><span class="sc">{</span>a[<span class="st">'mw'</span>]<span class="sc">:,}</span><span class="ss"> → </span><span class="sc">{</span>b[<span class="st">'mw'</span>]<span class="sc">:,}</span><span class="ss"> MW&lt;/div&gt;&lt;div class="k"&gt;peak electricity&lt;/div&gt;&lt;/div&gt;</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="ss">&lt;/div&gt;"""</span>)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="fu">## What this is</span></span>
 <span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="fu">## The decision</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>Two models, coupled.</span>
 <span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>Each year, every household without an AC draws against</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>u = \beta_0 + \beta_a (\text{afford} - 1) + \beta_d \left(\frac{\text{discomfort}_i}{\text{discomfort}_\text{ref}} - 1\right) + \beta_p\, \text{peer}_i</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>**A bottom-up urban building energy model.** Building footprints and heights become a</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>stock of typed archetypes. Each carries an appliance load and a cooling load driven by</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>outdoor temperature, and each rejects waste heat to the street: base electricity roughly</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>one-to-one, plus condenser heat of Q~cool~(1 + 1/COP). Human metabolism and road traffic</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>are added, and the total is aggregated to a 100 m grid at hourly resolution.</span>
 <span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>p_i = \frac{p_\text{cap}}{1 + e^{-u}}</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**afford** rises with real income growth against a falling real AC price, scaled down at</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>  low income bands (the same price is a larger barrier further down the distribution).</span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**discomfort~i~** is that agent's own indoor degree-hours above the comfort threshold,</span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>  including any warming the city has caused itself.</span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**peer~i~** is the share of households owning an AC within the agent's neighbourhood,</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>  computed on a 500 m grid with 3×3 smoothing rather than a radius query — the calculation</span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>  repeats every simulated year over 580,890 buildings.</span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>Adoption is a binomial draw on the non-owning households, so **penetration is an output**.</span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>Nothing forces the trajectory toward a target.</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>**An agent-based model of who buys an air conditioner.** Households are agents. Each year,</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>every household without an AC decides whether to buy one, based on what it can afford, how</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>hot its own dwelling gets, and how many of its neighbours already have one. Those that own</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>one choose a setpoint and how long to run it. The resulting waste heat raises the city's</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>temperature, which raises next year's discomfort — the loop that makes this an ABM rather</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>than a projection.</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="fu">## What it shows</span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>**The city-scale magnitude checks out.** Q~f~ over built cells comes to</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="in">`{python} a['qf']`</span> W/m² against 23.5 W/m² from the published extrapolation for Mumbai,</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>but peaks at 18:00 rather than 16:00. That two-hour gap is the substantive result: the</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>benchmark's diurnal shape comes from US utility load curves, while Indian residential</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>demand peaks in the evening.</span>
 <span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="fu">## Operation</span></span>
-<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>Ownership is a weak proxy for heat output: a household cooling one room for two hours a</span>
-<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>night and one cooling a whole flat for ten differ fourfold. Two behavioural variables</span>
-<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>close that gap.</span>
-<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>**Setpoint** falls with income band (27 °C at the bottom, 24 °C at the top).</span>
-<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>**Runtime** is logistic in mean indoor exceedance above the setpoint, damped by a bill</span>
-<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>sensitivity that is lower for poorer households. Both are read back by the load model.</span>
-<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>ts <span class="op">=</span> pd.read_csv(<span class="st">"data/processed/abm2_timeseries.csv"</span>)</span>
-<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>pd.DataFrame({</span>
-<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>  <span class="st">"year"</span>: ts.year,</span>
-<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>  <span class="st">"penetration %"</span>: (<span class="dv">100</span><span class="op">*</span>ts.pen_med).<span class="bu">round</span>(<span class="dv">1</span>),</span>
-<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>  <span class="st">"mean runtime"</span>: ts.runtime_med.<span class="bu">round</span>(<span class="dv">2</span>),</span>
-<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Qf mean W/m²"</span>: ts.qf_med.<span class="bu">round</span>(<span class="dv">2</span>),</span>
-<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ΔT °C"</span>: ts.dt_med.<span class="bu">round</span>(<span class="dv">2</span>),</span>
-<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>  <span class="st">"peak MW"</span>: ts.elec_med.<span class="bu">round</span>(<span class="dv">0</span>).astype(<span class="bu">int</span>),</span>
-<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>}).set_index(<span class="st">"year"</span>)</span>
-<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>The city-wide mean runtime is where the inequality shows up in aggregate: it dropped from</span>
-<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>0.74 to 0.60 the moment 284,216 buildings were reclassified as informal, because those</span>
-<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>households sit in the highest-setpoint, most bill-sensitive group. Operation behaviour, not</span>
-<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a>ownership, did that.</span>
-<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a><span class="fu">## What the model is not</span></span>
-<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a>It has no replacement cycle (units are bought, never retired), no explicit tariff slabs, no</span>
-<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a>tenure split between owners and renters, and no change in the building stock — no</span>
-<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a>redevelopment, no new construction, no population growth. Commercial and industrial cooling</span>
-<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a>is a fixed fraction per archetype and sits outside the ABM entirely, despite being 43% of</span>
-<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>modelled energy.</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>**Adoption roughly triples by 2040**, adding <span class="in">`{python} round(b['qf']-a['qf'],1)`</span> W/m² of</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>waste heat and <span class="in">`{python} b['mw']-a['mw']`</span> MW of peak demand, with no population growth or</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>new construction in the model.</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>**Thermal inequality is measurable and it runs the wrong way.** Informal dwellings sit</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>1.6 °C hotter on average and 4.0 °C hotter at peak than tower flats, carry 65% more</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>discomfort degree-hours, and run cooling at 64% of the rate. The heat they are exposed to</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>outdoors is produced largely by other people's machines.</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>**The two mechanisms are separable.** Sensitivity screening puts affordability and the</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>baseline purchase rate at the top and indoor discomfort near the bottom for adoption, while</span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>discomfort produces the largest spread across the stock. Income and price decide *who</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>adopts*; building fabric decides *who suffers while not adopting*.</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>::: {.caveat}</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>**This is an uncalibrated prototype.** The building physics and the agent logic are real;</span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>the behavioural coefficients are not fitted to observation, and the two that dominate the</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>result have no empirical anchor. Treat trajectories as structural, not predictive. See</span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Limits</span><span class="co">](limitations.qmd)</span>.</span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a><span class="fu">## Built in a day</span></span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>The whole pipeline — data assembly, energy model, thermal model, ABM, sensitivity</span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>screening, web map — was built in a single session on 19 September 2026, then paused for</span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>documentation. <span class="co">[</span><span class="ot">Reproduce</span><span class="co">](reproduce.qmd)</span> has the commands.</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
@@ -1039,7 +809,7 @@ p_i = \frac{p_\text{cap}}{1 + e^{-u}}
 </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/Manish-Bilore/mumbai-anthropogenic-heat/blob/main/abm.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/Manish-Bilore/mumbai-anthropogenic-heat/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/Manish-Bilore/mumbai-anthropogenic-heat/blob/main/overview.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/Manish-Bilore/mumbai-anthropogenic-heat/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>Code MIT · footprints GlobalBuildingAtlas · basemap © OpenStreetMap</p>
 </div>

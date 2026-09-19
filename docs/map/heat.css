@@ -1,0 +1,85 @@
+/* Shared tokens for the Mumbai heat story + viewer. Served at /map/heat.css. */
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..500&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap");
+
+:root {
+  --ink: #171716;
+  --ink-2: #211f1c;
+  --ink-3: #2c2925;
+  --paper: #f4f0e8;
+  --paper-2: #ebe5d9;
+  --sand: #d9cbb5;
+  --stone: #8f877a;
+  --stone-dark: #6a6357;
+  --rule-dark: rgba(244, 240, 232, 0.14);
+  --rule-light: rgba(23, 23, 22, 0.14);
+
+  /* heat: reserved for Q_f magnitude and nothing else */
+  --h0: #3a221d;
+  --h1: #762b25;
+  --h2: #c84630;
+  --h3: #e76f32;
+  --h4: #f2c14e;
+  --h5: #fff3cf;
+  --sea: #277c78;
+
+  --serif: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --sans: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.eyebrow {
+  font: 500 11px/1.2 var(--mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.num { font-variant-numeric: tabular-nums lining-nums; }
+
+.heat-legend {
+  height: 8px;
+  background: linear-gradient(90deg, var(--h0) 0%, var(--h1) 18%, var(--h2) 38%, var(--h3) 56%, var(--h4) 76%, var(--h5) 100%);
+}
+
+.status-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  font: 500 10.5px/1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 7px 10px; border: 1px solid currentColor; color: var(--h4);
+  text-decoration: none; white-space: nowrap;
+}
+.status-badge::before {
+  content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor;
+}
+.status-badge:hover { background: rgba(242, 193, 78, 0.12); }
+
+.place-label {
+  font: 500 10px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(244, 240, 232, 0.78);
+  text-shadow: 0 0 3px #171716, 0 0 8px #171716, 0 0 12px #171716;
+  pointer-events: none; white-space: nowrap;
+  transition: opacity 300ms var(--ease);
+}
+.place-label.green { color: #8fb8a6; font-style: italic; text-transform: none; letter-spacing: 0.04em; font-family: var(--serif); font-size: 13px; }
+
+/* chart primitives shared by viewer and story */
+.dchart { display: block; width: 100%; height: 100%; overflow: visible; touch-action: none; }
+.dchart .grid line { stroke: currentColor; opacity: 0.12; }
+.dchart .axis text { font: 400 10px var(--mono); fill: currentColor; opacity: 0.6; }
+.dchart .cursor { stroke: currentColor; stroke-width: 1; }
+.dchart .cursor-label { font: 500 10.5px var(--mono); fill: currentColor; }
+.dchart .hit { fill: transparent; cursor: ew-resize; }
+.dchart .series-label { font: 500 10px var(--mono); }
+
+.chart-tip {
+  position: fixed; z-index: 50; pointer-events: none;
+  background: var(--ink); color: var(--paper); border: 1px solid var(--rule-dark);
+  font: 400 12px/1.45 var(--sans); padding: 8px 10px; min-width: 150px;
+  opacity: 0; transform: translateY(4px); transition: opacity 120ms, transform 120ms;
+}
+.chart-tip.on { opacity: 1; transform: none; }
+.chart-tip .row { display: flex; justify-content: space-between; gap: 14px; }
+.chart-tip .sw { display: inline-block; width: 10px; height: 2px; margin-right: 6px; vertical-align: middle; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0ms !important; animation-duration: 0ms !important; }
+}

@@ -1,5 +1,117 @@
 [
   {
+    "objectID": "NEXT_STEPS.html",
+    "href": "NEXT_STEPS.html",
+    "title": "",
+    "section": "",
+    "text": "Code"
+  },
+  {
+    "objectID": "NEXT_STEPS.html#phase-now-documentation",
+    "href": "NEXT_STEPS.html#phase-now-documentation",
+    "title": "",
+    "section": "Phase now: documentation",
+    "text": "Phase now: documentation\n\nREADME rewritten for the dynamic ABM\nviewer reads web/series.json instead of hardcoded numbers\nQuarto site scaffolded (_quarto.yml, 7 pages, custom theme)\nrender, check figures and tables build from the CSVs\nswitch Pages to main + /docs, retire gh-pages\none figure worth making that does not exist yet: ward-level map of discomfort vs AC penetration by income band — the inequality result currently lives only in a table"
+  },
+  {
+    "objectID": "NEXT_STEPS.html#immediate-not-blocked-by-anything",
+    "href": "NEXT_STEPS.html#immediate-not-blocked-by-anything",
+    "title": "",
+    "section": "Immediate, not blocked by anything",
+    "text": "Immediate, not blocked by anything\nSend the data requests. The RTI ones take weeks; everything in Phase A waits on them.\n\n\n\n\n\n\n\n\nrequest\nto\nfor\n\n\n\n\nAC ownership by income band\nCEEW (IRES Maharashtra subset)\ncalibration\n\n\nfeeder / division monthly load\nAEML, BEST, Tata Power, MSEDCL\nvalidation\n\n\ntariff slabs + ToD structure\nMERC orders (public, no request needed)\ntariff term\n\n\nhousehold travel / traffic counts\nMMRDA CTS\nvehicle heat\n\n\nmachine-readable ASR\nIGR Maharashtra\nincome proxy"
+  },
+  {
+    "objectID": "NEXT_STEPS.html#phase-a-calibration-changes-the-models-status",
+    "href": "NEXT_STEPS.html#phase-a-calibration-changes-the-models-status",
+    "title": "",
+    "section": "Phase A — calibration (changes the model’s status)",
+    "text": "Phase A — calibration (changes the model’s status)\nMorris says p_cap and b0 dominate; both are pure knobs. Fit them, leave the rest.\n\nHistory matching to rule out implausible coefficient space, using two anchors: current AC ownership by income band, and the observed licensee summer load trend.\nABC for credible intervals on the surviving space.\nReport trajectories as bands over coefficient uncertainty, not over seeds."
+  },
+  {
+    "objectID": "NEXT_STEPS.html#phase-b-replace-the-uniform-δt",
+    "href": "NEXT_STEPS.html#phase-b-replace-the-uniform-δt",
+    "title": "",
+    "section": "Phase B — replace the uniform ΔT",
+    "text": "Phase B — replace the uniform ΔT\nSUEWS through UMEP, one run per LCZ class, forced by MCGM AWS. Gives night-vs-day and dense-vs-sparse differentiation, which is where the AC feedback literature finds its signal. The MMR LCZ map already exists."
+  },
+  {
+    "objectID": "NEXT_STEPS.html#phase-c-behavioural-additions-cheapest-first",
+    "href": "NEXT_STEPS.html#phase-c-behavioural-additions-cheapest-first",
+    "title": "",
+    "section": "Phase C — behavioural additions, cheapest first",
+    "text": "Phase C — behavioural additions, cheapest first\n\nTariff slabs — free from MERC orders, affects adoption and runtime.\nTenure — one binary attribute from Census ward ownership share; split incentives.\nReplacement cycle — lets efficiency standards be tested at all.\nCommercial cooling inside the ABM — currently exogenous, 43% of energy."
+  },
+  {
+    "objectID": "NEXT_STEPS.html#phase-d-structural",
+    "href": "NEXT_STEPS.html#phase-d-structural",
+    "title": "",
+    "section": "Phase D — structural",
+    "text": "Phase D — structural\n\nRedevelopment pipeline: chawls → towers changes archetype mix over 15 years.\nDaytime population from Time Use Survey schedules.\nExtend to MMR once ward-equivalent population exists for Thane and Navi Mumbai (92,693 buildings already extracted, saved in data/interim/buildings_out_of_scope.parquet)."
+  },
+  {
+    "objectID": "NEXT_STEPS.html#decisions-made-with-reasons",
+    "href": "NEXT_STEPS.html#decisions-made-with-reasons",
+    "title": "",
+    "section": "Decisions made, with reasons",
+    "text": "Decisions made, with reasons\n\n\n\n\n\n\n\ndecision\nreason\n\n\n\n\nGreater Mumbai only\nward population and boundaries exist for the 24 BMC wards\n\n\nQ_f is an output of the UBEM, not an input\nSailor’s extrapolation is the benchmark, not the source\n\n\nbuilt-cell mean, not all-cell\n18,173 of 48,428 cells are sea, creek, SGNP, Aarey\n\n\nstation-era weather only (2020+)\nthe record splices two sources differing by ~1.5 °C Tmax\n\n\nΔT as a scalar coefficient\nno surface energy balance model available; flagged as the largest assumption\n\n\n3 replicates, not 30\nseed variance &lt;0.1 pp at city scale\n\n\nMorris r = 2, not 10\nranking unambiguous; 90 evaluations add nothing\n\n\ngrid + 3×3 smoothing for peer effects\nradius queries over 580k buildings × 15 years are not worth the fidelity\n\n\nres_slum by polygon, not height\nonly 0.8% of slum-flagged buildings exceed three floors"
+  },
+  {
+    "objectID": "NEXT_STEPS.html#traps-already-hit",
+    "href": "NEXT_STEPS.html#traps-already-hit",
+    "title": "",
+    "section": "Traps already hit",
+    "text": "Traps already hit\n\nMulti-line Python pasted into bash: always cat &gt; file &lt;&lt;'PYEOF' or python - &lt;&lt;'PYEOF'.\npip install into conda base broke NumPy compatibility across pandas/pyarrow/numba. The project has its own env now; NumPy pinned &lt;2.\npython -m http.server ignores Range requests, so PMTiles fails silently. Use RangeHTTPServer; GitHub Pages handles ranges correctly.\nTippecanoe drops up to 97% of features when tiles exceed 500 KB. Use --no-feature-limit --no-tile-size-limit, drop empty cells, round to integers.\nMCGM ward codes arrive as F/ S, G /N with stray spaces — normalise before joining.\nSlum sjoin produced 860 duplicate rows from overlapping polygons — dissolve first.\nPopulation allocation fails silently on ward-code mismatch; 02 now raises below 90%.\nSALib 1.6 requires NumPy ≥2 — pin SALib &lt;1.6."
+  },
+  {
+    "objectID": "reproduce.html",
+    "href": "reproduce.html",
+    "title": "Reproduce",
+    "section": "",
+    "text": "git clone git@github.com:Manish-Bilore/mumbai-anthropogenic-heat.git\ncd mumbai-anthropogenic-heat\nconda env create -f environment.yml\nconda activate mumbaiqf\nNumPy is pinned below 2.0: several compiled dependencies in the geospatial stack are built against the 1.x ABI."
+  },
+  {
+    "objectID": "reproduce.html#environment",
+    "href": "reproduce.html#environment",
+    "title": "Reproduce",
+    "section": "",
+    "text": "git clone git@github.com:Manish-Bilore/mumbai-anthropogenic-heat.git\ncd mumbai-anthropogenic-heat\nconda env create -f environment.yml\nconda activate mumbaiqf\nNumPy is pinned below 2.0: several compiled dependencies in the geospatial stack are built against the 1.x ABI."
+  },
+  {
+    "objectID": "reproduce.html#inputs",
+    "href": "reproduce.html#inputs",
+    "title": "Reproduce",
+    "section": "Inputs",
+    "text": "Inputs\nPlace in data/raw/ (see Data for sources):\nbuildings.gpkg, mumbai_typology.gpkg, wards.gpkg, mumbai_ward_population_bmc.csv, mapped_slums_2016.kml, mumbai_daily_temperature_1951_2024.csv, rr_localities.csv"
+  },
+  {
+    "objectID": "reproduce.html#pipeline",
+    "href": "reproduce.html#pipeline",
+    "title": "Reproduce",
+    "section": "Pipeline",
+    "text": "Pipeline\npython scripts/00a_normalise_ward_population.py       # BMC export -&gt; schema\npython scripts/00b_normalise_inputs.py                # wards, buildings, typology\npython scripts/00c_make_typical_day.py --from-year 2020\npython scripts/08_build_income_proxy.py               # ASR localities -&gt; ward medians\npython scripts/01_prepare_stock.py                    # floors, area, archetype, ward\npython scripts/02_assign_population.py                # households, income band\npython scripts/03_run_loads.py                        # hourly loads + waste heat\npython scripts/04_gridify.py                          # 100 m grid + metabolism + traffic\npython scripts/06_benchmark.py                        # vs Sailor et al.\npython scripts/10_abm_ensemble.py --replicates 3      # the ABM\npython scripts/11_morris_screening.py --trajectories 2\npython scripts/12_export_web_series.py                # web/series.json\nThen the map tiles (needs tippecanoe):\ntippecanoe -o web/tiles/qf_years.pmtiles -l qf_years -Z 9 -z 14 \\\n  --no-feature-limit --no-tile-size-limit --force \\\n  data/processed/qf_grid_years.geojson\nPreview locally with a server that honours HTTP Range requests — python -m http.server does not, and PMTiles will silently fail:\ncd web && python -m RangeHTTPServer 8000"
+  },
+  {
+    "objectID": "reproduce.html#everything-is-in-one-file",
+    "href": "reproduce.html#everything-is-in-one-file",
+    "title": "Reproduce",
+    "section": "Everything is in one file",
+    "text": "Everything is in one file\nconfig/params.yaml holds every parameter, tagged [placeholder], [literature] or [official]. Nothing numeric is hardcoded in the modules. The file’s hash is written into every log line, so any result traces back to the exact parameter set that produced it."
+  },
+  {
+    "objectID": "reproduce.html#runtimes",
+    "href": "reproduce.html#runtimes",
+    "title": "Reproduce",
+    "section": "Runtimes",
+    "text": "Runtimes\nMeasured on a laptop, 580,890 buildings:\n\n\n\nstep\ntime\n\n\n\n\nstock, population\n~30 s\n\n\nloads + grid\n~1 min\n\n\nABM, 3 replicates\n~5 min\n\n\nMorris, r = 2 (18 evaluations)\n~11 min\n\n\ntiling\n~2 min"
+  },
+  {
+    "objectID": "reproduce.html#building-this-site",
+    "href": "reproduce.html#building-this-site",
+    "title": "Reproduce",
+    "section": "Building this site",
+    "text": "Building this site\nquarto render          # -&gt; docs/, copies web/ into docs/map/\nGitHub Pages serves docs/ from main."
+  },
+  {
     "objectID": "limitations.html",
     "href": "limitations.html",
     "title": "Limits",
@@ -98,6 +210,55 @@
     "text": "5. On ensembles\nStochastic replicates are not this model’s uncertainty. Across seeds, 2040 penetration varies by under 0.1 percentage points: with 3.2 million households, binomial noise averages out completely. The uncertainty lives in the coefficients, which is why screening and calibration matter here and ensembles do not."
   },
   {
+    "objectID": "map.html",
+    "href": "map.html",
+    "title": "Interactive map",
+    "section": "",
+    "text": "The map has moved to its own full-screen page: open the interactive map.\nHourly anthropogenic heat on a 100 m grid, for four snapshot years of the adoption model. Step the year to watch waste heat grow as households buy air conditioners; drag the day curve to see the evening peak build. Click any cell for its value across all four years.\nReading it. The island city and the eastern suburbs carry the highest values; SGNP, Aarey and the creeks are empty because no buildings sit there. Cell-level variance is real rather than noise — a 100 m cell holding one tower differs sharply from its neighbour holding three chawls — but at this resolution the picture is grainier than a published Qf atlas would normally be shown."
+  },
+  {
+    "objectID": "abm.html",
+    "href": "abm.html",
+    "title": "The agent-based model",
+    "section": "",
+    "text": "A spreadsheet can multiply an assumed penetration rate by a cooling load. Three things here need agents:\nHeterogeneity that interacts with the physics. The dwelling that gets hottest belongs to the household least able to buy cooling. That correlation determines the aggregate, and it cannot be recovered from city means.\nPeer effects. Adoption spreads through neighbourhoods. The share of nearby households already owning an AC enters each decision, so adoption compounds spatially instead of rising uniformly.\nA feedback loop. Waste heat raises outdoor temperature, which raises indoor temperature, which raises discomfort, which raises adoption. The loop only exists if the agents re-read their environment each year."
+  },
+  {
+    "objectID": "abm.html#why-agents",
+    "href": "abm.html#why-agents",
+    "title": "The agent-based model",
+    "section": "",
+    "text": "A spreadsheet can multiply an assumed penetration rate by a cooling load. Three things here need agents:\nHeterogeneity that interacts with the physics. The dwelling that gets hottest belongs to the household least able to buy cooling. That correlation determines the aggregate, and it cannot be recovered from city means.\nPeer effects. Adoption spreads through neighbourhoods. The share of nearby households already owning an AC enters each decision, so adoption compounds spatially instead of rising uniformly.\nA feedback loop. Waste heat raises outdoor temperature, which raises indoor temperature, which raises discomfort, which raises adoption. The loop only exists if the agents re-read their environment each year."
+  },
+  {
+    "objectID": "abm.html#agents",
+    "href": "abm.html#agents",
+    "title": "The agent-based model",
+    "section": "Agents",
+    "text": "Agents\nOne household cohort per residential building: an integer count of households, of which an integer count own an air conditioner. That makes 3.2 million household agents cost two integer arrays rather than three million Python objects.\n\n\n\n\n\n\n\nattribute\nsource\n\n\n\n\nhouseholds\nward population → residential floor area → archetype occupancy\n\n\nincome band\nready-reckoner quartile, slums pinned to the lowest\n\n\narchetype\ntypology + floor count + slum flag\n\n\nindoor temperature, discomfort\n1R1C model on that building’s fabric\n\n\nAC ownership\nstate variable, updated annually\n\n\nsetpoint, runtime\nchosen from income band and indoor exceedance"
+  },
+  {
+    "objectID": "abm.html#the-decision",
+    "href": "abm.html#the-decision",
+    "title": "The agent-based model",
+    "section": "The decision",
+    "text": "The decision\nEach year, every household without an AC draws against\n\\[\nu = \\beta_0 + \\beta_a (\\text{afford} - 1) + \\beta_d \\left(\\frac{\\text{discomfort}_i}{\\text{discomfort}_\\text{ref}} - 1\\right) + \\beta_p\\, \\text{peer}_i\n\\]\n\\[\np_i = \\frac{p_\\text{cap}}{1 + e^{-u}}\n\\]\n\nafford rises with real income growth against a falling real AC price, scaled down at low income bands (the same price is a larger barrier further down the distribution).\ndiscomforti is that agent’s own indoor degree-hours above the comfort threshold, including any warming the city has caused itself.\npeeri is the share of households owning an AC within the agent’s neighbourhood, computed on a 500 m grid with 3×3 smoothing rather than a radius query — the calculation repeats every simulated year over 580,890 buildings.\n\nAdoption is a binomial draw on the non-owning households, so penetration is an output. Nothing forces the trajectory toward a target."
+  },
+  {
+    "objectID": "abm.html#operation",
+    "href": "abm.html#operation",
+    "title": "The agent-based model",
+    "section": "Operation",
+    "text": "Operation\nOwnership is a weak proxy for heat output: a household cooling one room for two hours a night and one cooling a whole flat for ten differ fourfold. Two behavioural variables close that gap.\nSetpoint falls with income band (27 °C at the bottom, 24 °C at the top). Runtime is logistic in mean indoor exceedance above the setpoint, damped by a bill sensitivity that is lower for poorer households. Both are read back by the load model.\n\n\n\n\n\n\n\n\n\npenetration %\nmean runtime\nQf mean W/m²\nΔT °C\npeak MW\n\n\nyear\n\n\n\n\n\n\n\n\n\n2026\n17.9\n0.60\n20.58\n0.00\n3064\n\n\n2027\n19.4\n0.60\n20.70\n0.00\n3081\n\n\n2028\n21.1\n0.60\n20.84\n0.01\n3101\n\n\n2029\n22.9\n0.60\n21.00\n0.01\n3123\n\n\n2030\n24.9\n0.60\n21.18\n0.02\n3148\n\n\n2031\n27.1\n0.60\n21.37\n0.03\n3175\n\n\n2032\n29.6\n0.60\n21.58\n0.04\n3204\n\n\n2033\n32.2\n0.60\n21.81\n0.05\n3237\n\n\n2034\n35.1\n0.60\n22.07\n0.06\n3272\n\n\n2035\n38.3\n0.60\n22.34\n0.07\n3309\n\n\n2036\n41.6\n0.60\n22.62\n0.09\n3349\n\n\n2037\n45.1\n0.60\n22.92\n0.10\n3390\n\n\n2038\n48.7\n0.60\n23.22\n0.12\n3432\n\n\n2039\n52.4\n0.61\n23.51\n0.13\n3475\n\n\n2040\n56.2\n0.61\n23.81\n0.15\n3516\n\n\n\n\n\n\n\nThe city-wide mean runtime is where the inequality shows up in aggregate: it dropped from 0.74 to 0.60 the moment 284,216 buildings were reclassified as informal, because those households sit in the highest-setpoint, most bill-sensitive group. Operation behaviour, not ownership, did that."
+  },
+  {
+    "objectID": "abm.html#what-the-model-is-not",
+    "href": "abm.html#what-the-model-is-not",
+    "title": "The agent-based model",
+    "section": "What the model is not",
+    "text": "What the model is not\nIt has no replacement cycle (units are bought, never retired), no explicit tariff slabs, no tenure split between owners and renters, and no change in the building stock — no redevelopment, no new construction, no population growth. Commercial and industrial cooling is a fixed fraction per archetype and sits outside the ABM entirely, despite being 43% of modelled energy."
+  },
+  {
     "objectID": "method.html",
     "href": "method.html",
     "title": "Method",
@@ -145,125 +306,6 @@
     "title": "Method",
     "section": "5. Feedback",
     "text": "5. Feedback\n\\[\n\\Delta T(t+1) = k \\big[\\overline{Q_f}(t) - \\overline{Q_f}(\\text{baseline})\\big]\n\\]\n\\(\\Delta T\\) raises the next year’s outdoor temperature series, which raises both cooling demand and indoor discomfort. \\(k\\) is a transfer coefficient standing in for a surface energy balance model; it is the largest physics assumption in the project and is swept explicitly. See Limits."
-  },
-  {
-    "objectID": "NEXT_STEPS.html",
-    "href": "NEXT_STEPS.html",
-    "title": "",
-    "section": "",
-    "text": "Code"
-  },
-  {
-    "objectID": "NEXT_STEPS.html#phase-now-documentation",
-    "href": "NEXT_STEPS.html#phase-now-documentation",
-    "title": "",
-    "section": "Phase now: documentation",
-    "text": "Phase now: documentation\n\nREADME rewritten for the dynamic ABM\nviewer reads web/series.json instead of hardcoded numbers\nQuarto site scaffolded (_quarto.yml, 7 pages, custom theme)\nrender, check figures and tables build from the CSVs\nswitch Pages to main + /docs, retire gh-pages\none figure worth making that does not exist yet: ward-level map of discomfort vs AC penetration by income band — the inequality result currently lives only in a table"
-  },
-  {
-    "objectID": "NEXT_STEPS.html#immediate-not-blocked-by-anything",
-    "href": "NEXT_STEPS.html#immediate-not-blocked-by-anything",
-    "title": "",
-    "section": "Immediate, not blocked by anything",
-    "text": "Immediate, not blocked by anything\nSend the data requests. The RTI ones take weeks; everything in Phase A waits on them.\n\n\n\n\n\n\n\n\nrequest\nto\nfor\n\n\n\n\nAC ownership by income band\nCEEW (IRES Maharashtra subset)\ncalibration\n\n\nfeeder / division monthly load\nAEML, BEST, Tata Power, MSEDCL\nvalidation\n\n\ntariff slabs + ToD structure\nMERC orders (public, no request needed)\ntariff term\n\n\nhousehold travel / traffic counts\nMMRDA CTS\nvehicle heat\n\n\nmachine-readable ASR\nIGR Maharashtra\nincome proxy"
-  },
-  {
-    "objectID": "NEXT_STEPS.html#phase-a-calibration-changes-the-models-status",
-    "href": "NEXT_STEPS.html#phase-a-calibration-changes-the-models-status",
-    "title": "",
-    "section": "Phase A — calibration (changes the model’s status)",
-    "text": "Phase A — calibration (changes the model’s status)\nMorris says p_cap and b0 dominate; both are pure knobs. Fit them, leave the rest.\n\nHistory matching to rule out implausible coefficient space, using two anchors: current AC ownership by income band, and the observed licensee summer load trend.\nABC for credible intervals on the surviving space.\nReport trajectories as bands over coefficient uncertainty, not over seeds."
-  },
-  {
-    "objectID": "NEXT_STEPS.html#phase-b-replace-the-uniform-δt",
-    "href": "NEXT_STEPS.html#phase-b-replace-the-uniform-δt",
-    "title": "",
-    "section": "Phase B — replace the uniform ΔT",
-    "text": "Phase B — replace the uniform ΔT\nSUEWS through UMEP, one run per LCZ class, forced by MCGM AWS. Gives night-vs-day and dense-vs-sparse differentiation, which is where the AC feedback literature finds its signal. The MMR LCZ map already exists."
-  },
-  {
-    "objectID": "NEXT_STEPS.html#phase-c-behavioural-additions-cheapest-first",
-    "href": "NEXT_STEPS.html#phase-c-behavioural-additions-cheapest-first",
-    "title": "",
-    "section": "Phase C — behavioural additions, cheapest first",
-    "text": "Phase C — behavioural additions, cheapest first\n\nTariff slabs — free from MERC orders, affects adoption and runtime.\nTenure — one binary attribute from Census ward ownership share; split incentives.\nReplacement cycle — lets efficiency standards be tested at all.\nCommercial cooling inside the ABM — currently exogenous, 43% of energy."
-  },
-  {
-    "objectID": "NEXT_STEPS.html#phase-d-structural",
-    "href": "NEXT_STEPS.html#phase-d-structural",
-    "title": "",
-    "section": "Phase D — structural",
-    "text": "Phase D — structural\n\nRedevelopment pipeline: chawls → towers changes archetype mix over 15 years.\nDaytime population from Time Use Survey schedules.\nExtend to MMR once ward-equivalent population exists for Thane and Navi Mumbai (92,693 buildings already extracted, saved in data/interim/buildings_out_of_scope.parquet)."
-  },
-  {
-    "objectID": "NEXT_STEPS.html#decisions-made-with-reasons",
-    "href": "NEXT_STEPS.html#decisions-made-with-reasons",
-    "title": "",
-    "section": "Decisions made, with reasons",
-    "text": "Decisions made, with reasons\n\n\n\n\n\n\n\ndecision\nreason\n\n\n\n\nGreater Mumbai only\nward population and boundaries exist for the 24 BMC wards\n\n\nQ_f is an output of the UBEM, not an input\nSailor’s extrapolation is the benchmark, not the source\n\n\nbuilt-cell mean, not all-cell\n18,173 of 48,428 cells are sea, creek, SGNP, Aarey\n\n\nstation-era weather only (2020+)\nthe record splices two sources differing by ~1.5 °C Tmax\n\n\nΔT as a scalar coefficient\nno surface energy balance model available; flagged as the largest assumption\n\n\n3 replicates, not 30\nseed variance &lt;0.1 pp at city scale\n\n\nMorris r = 2, not 10\nranking unambiguous; 90 evaluations add nothing\n\n\ngrid + 3×3 smoothing for peer effects\nradius queries over 580k buildings × 15 years are not worth the fidelity\n\n\nres_slum by polygon, not height\nonly 0.8% of slum-flagged buildings exceed three floors"
-  },
-  {
-    "objectID": "NEXT_STEPS.html#traps-already-hit",
-    "href": "NEXT_STEPS.html#traps-already-hit",
-    "title": "",
-    "section": "Traps already hit",
-    "text": "Traps already hit\n\nMulti-line Python pasted into bash: always cat &gt; file &lt;&lt;'PYEOF' or python - &lt;&lt;'PYEOF'.\npip install into conda base broke NumPy compatibility across pandas/pyarrow/numba. The project has its own env now; NumPy pinned &lt;2.\npython -m http.server ignores Range requests, so PMTiles fails silently. Use RangeHTTPServer; GitHub Pages handles ranges correctly.\nTippecanoe drops up to 97% of features when tiles exceed 500 KB. Use --no-feature-limit --no-tile-size-limit, drop empty cells, round to integers.\nMCGM ward codes arrive as F/ S, G /N with stray spaces — normalise before joining.\nSlum sjoin produced 860 duplicate rows from overlapping polygons — dissolve first.\nPopulation allocation fails silently on ward-code mismatch; 02 now raises below 90%.\nSALib 1.6 requires NumPy ≥2 — pin SALib &lt;1.6."
-  },
-  {
-    "objectID": "map.html",
-    "href": "map.html",
-    "title": "Interactive map",
-    "section": "",
-    "text": "Hourly anthropogenic heat on a 100 m grid, for four snapshot years of the adoption model. Drag the year slider to watch waste heat grow as households buy air conditioners; drag the hour slider to see the evening peak build. Click any cell for its value across all four years.\n\nOpen the map full screen\nReading it. The island city and the eastern suburbs carry the highest values; SGNP, Aarey and the creeks are empty because no buildings sit there. Cell-level variance is real rather than noise — a 100 m cell holding one tower differs sharply from its neighbour holding three chawls — but at this resolution the picture is grainier than a published Qf atlas would normally be shown."
-  },
-  {
-    "objectID": "reproduce.html",
-    "href": "reproduce.html",
-    "title": "Reproduce",
-    "section": "",
-    "text": "git clone git@github.com:Manish-Bilore/mumbai-anthropogenic-heat.git\ncd mumbai-anthropogenic-heat\nconda env create -f environment.yml\nconda activate mumbaiqf\nNumPy is pinned below 2.0: several compiled dependencies in the geospatial stack are built against the 1.x ABI."
-  },
-  {
-    "objectID": "reproduce.html#environment",
-    "href": "reproduce.html#environment",
-    "title": "Reproduce",
-    "section": "",
-    "text": "git clone git@github.com:Manish-Bilore/mumbai-anthropogenic-heat.git\ncd mumbai-anthropogenic-heat\nconda env create -f environment.yml\nconda activate mumbaiqf\nNumPy is pinned below 2.0: several compiled dependencies in the geospatial stack are built against the 1.x ABI."
-  },
-  {
-    "objectID": "reproduce.html#inputs",
-    "href": "reproduce.html#inputs",
-    "title": "Reproduce",
-    "section": "Inputs",
-    "text": "Inputs\nPlace in data/raw/ (see Data for sources):\nbuildings.gpkg, mumbai_typology.gpkg, wards.gpkg, mumbai_ward_population_bmc.csv, mapped_slums_2016.kml, mumbai_daily_temperature_1951_2024.csv, rr_localities.csv"
-  },
-  {
-    "objectID": "reproduce.html#pipeline",
-    "href": "reproduce.html#pipeline",
-    "title": "Reproduce",
-    "section": "Pipeline",
-    "text": "Pipeline\npython scripts/00a_normalise_ward_population.py       # BMC export -&gt; schema\npython scripts/00b_normalise_inputs.py                # wards, buildings, typology\npython scripts/00c_make_typical_day.py --from-year 2020\npython scripts/08_build_income_proxy.py               # ASR localities -&gt; ward medians\npython scripts/01_prepare_stock.py                    # floors, area, archetype, ward\npython scripts/02_assign_population.py                # households, income band\npython scripts/03_run_loads.py                        # hourly loads + waste heat\npython scripts/04_gridify.py                          # 100 m grid + metabolism + traffic\npython scripts/06_benchmark.py                        # vs Sailor et al.\npython scripts/10_abm_ensemble.py --replicates 3      # the ABM\npython scripts/11_morris_screening.py --trajectories 2\npython scripts/12_export_web_series.py                # web/series.json\nThen the map tiles (needs tippecanoe):\ntippecanoe -o web/tiles/qf_years.pmtiles -l qf_years -Z 9 -z 14 \\\n  --no-feature-limit --no-tile-size-limit --force \\\n  data/processed/qf_grid_years.geojson\nPreview locally with a server that honours HTTP Range requests — python -m http.server does not, and PMTiles will silently fail:\ncd web && python -m RangeHTTPServer 8000"
-  },
-  {
-    "objectID": "reproduce.html#everything-is-in-one-file",
-    "href": "reproduce.html#everything-is-in-one-file",
-    "title": "Reproduce",
-    "section": "Everything is in one file",
-    "text": "Everything is in one file\nconfig/params.yaml holds every parameter, tagged [placeholder], [literature] or [official]. Nothing numeric is hardcoded in the modules. The file’s hash is written into every log line, so any result traces back to the exact parameter set that produced it."
-  },
-  {
-    "objectID": "reproduce.html#runtimes",
-    "href": "reproduce.html#runtimes",
-    "title": "Reproduce",
-    "section": "Runtimes",
-    "text": "Runtimes\nMeasured on a laptop, 580,890 buildings:\n\n\n\nstep\ntime\n\n\n\n\nstock, population\n~30 s\n\n\nloads + grid\n~1 min\n\n\nABM, 3 replicates\n~5 min\n\n\nMorris, r = 2 (18 evaluations)\n~11 min\n\n\ntiling\n~2 min"
-  },
-  {
-    "objectID": "reproduce.html#building-this-site",
-    "href": "reproduce.html#building-this-site",
-    "title": "Reproduce",
-    "section": "Building this site",
-    "text": "Building this site\nquarto render          # -&gt; docs/, copies web/ into docs/map/\nGitHub Pages serves docs/ from main."
   },
   {
     "objectID": "STATUS.html",
@@ -315,6 +357,34 @@
     "text": "Open threads\nSee NEXT_STEPS.md. Highest priority: send the data requests (CEEW IRES, licensee load, MERC tariffs, CTS traffic counts), because the RTI ones take weeks and everything else waits on them."
   },
   {
+    "objectID": "overview.html",
+    "href": "overview.html",
+    "title": "Anthropogenic heat and air-conditioner adoption in Greater Mumbai",
+    "section": "",
+    "text": "Every air conditioner moves heat from inside a building to the street. As Mumbai’s households buy them, the city’s waste heat rises — and the households least able to afford cooling live in the dwellings that get hottest.\nThis project quantifies both halves of that sentence for all 580,890 buildings inside the 24 BMC wards.\n← The visual story   Explore the map →\n20.58 W/m²Qf mean over built cells, 2026\n  17.9% → 56.2%AC penetration, 2026 → 2040\n  23.81 W/m²Qf mean, 2040\n  +0.15 °Cwaste-heat feedback by 2040\n  3,064 → 3,516 MWpeak electricity"
+  },
+  {
+    "objectID": "overview.html#what-this-is",
+    "href": "overview.html#what-this-is",
+    "title": "Anthropogenic heat and air-conditioner adoption in Greater Mumbai",
+    "section": "What this is",
+    "text": "What this is\nTwo models, coupled.\nA bottom-up urban building energy model. Building footprints and heights become a stock of typed archetypes. Each carries an appliance load and a cooling load driven by outdoor temperature, and each rejects waste heat to the street: base electricity roughly one-to-one, plus condenser heat of Qcool(1 + 1/COP). Human metabolism and road traffic are added, and the total is aggregated to a 100 m grid at hourly resolution.\nAn agent-based model of who buys an air conditioner. Households are agents. Each year, every household without an AC decides whether to buy one, based on what it can afford, how hot its own dwelling gets, and how many of its neighbours already have one. Those that own one choose a setpoint and how long to run it. The resulting waste heat raises the city’s temperature, which raises next year’s discomfort — the loop that makes this an ABM rather than a projection."
+  },
+  {
+    "objectID": "overview.html#what-it-shows",
+    "href": "overview.html#what-it-shows",
+    "title": "Anthropogenic heat and air-conditioner adoption in Greater Mumbai",
+    "section": "What it shows",
+    "text": "What it shows\nThe city-scale magnitude checks out. Qf over built cells comes to 20.58 W/m² against 23.5 W/m² from the published extrapolation for Mumbai, but peaks at 18:00 rather than 16:00. That two-hour gap is the substantive result: the benchmark’s diurnal shape comes from US utility load curves, while Indian residential demand peaks in the evening.\nAdoption roughly triples by 2040, adding 3.2 W/m² of waste heat and 452 MW of peak demand, with no population growth or new construction in the model.\nThermal inequality is measurable and it runs the wrong way. Informal dwellings sit 1.6 °C hotter on average and 4.0 °C hotter at peak than tower flats, carry 65% more discomfort degree-hours, and run cooling at 64% of the rate. The heat they are exposed to outdoors is produced largely by other people’s machines.\nThe two mechanisms are separable. Sensitivity screening puts affordability and the baseline purchase rate at the top and indoor discomfort near the bottom for adoption, while discomfort produces the largest spread across the stock. Income and price decide who adopts; building fabric decides who suffers while not adopting.\n\nThis is an uncalibrated prototype. The building physics and the agent logic are real; the behavioural coefficients are not fitted to observation, and the two that dominate the result have no empirical anchor. Treat trajectories as structural, not predictive. See Limits."
+  },
+  {
+    "objectID": "overview.html#built-in-a-day",
+    "href": "overview.html#built-in-a-day",
+    "title": "Anthropogenic heat and air-conditioner adoption in Greater Mumbai",
+    "section": "Built in a day",
+    "text": "Built in a day\nThe whole pipeline — data assembly, energy model, thermal model, ABM, sensitivity screening, web map — was built in a single session on 19 September 2026, then paused for documentation. Reproduce has the commands."
+  },
+  {
     "objectID": "data.html",
     "href": "data.html",
     "title": "Data",
@@ -355,75 +425,5 @@
     "title": "Data",
     "section": "Still to acquire",
     "text": "Still to acquire\n\n\n\n\n\n\n\n\nwhat\nfrom\nunlocks\n\n\n\n\nAC ownership by income\nCEEW India Residential Energy Survey, Maharashtra\ncalibration of the two dominant coefficients\n\n\nfeeder / division load\nAEML, BEST, Tata Power, MSEDCL\nvalidation of the 3,064 MW baseline\n\n\ntariff slabs and time-of-day\nMERC orders\nelectricity price in the adoption and runtime decisions\n\n\ntraffic counts\nMMRDA Comprehensive Transportation Study\nthe vehicle heat term, currently one invented number\n\n\ncurrent slum extents\nown Sentinel-2 classification\nreplaces the 2016 layer\n\n\nmachine-readable ASR\nIGR Maharashtra\nreplaces hand-transcribed localities"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Anthropogenic heat and air-conditioner adoption in Greater Mumbai",
-    "section": "",
-    "text": "Every air conditioner moves heat from inside a building to the street. As Mumbai’s households buy them, the city’s waste heat rises — and the households least able to afford cooling live in the dwellings that get hottest.\nThis project quantifies both halves of that sentence for all 580,890 buildings inside the 24 BMC wards.\n20.58 W/m²Qf mean over built cells, 2026\n  17.9% → 56.2%AC penetration, 2026 → 2040\n  23.81 W/m²Qf mean, 2040\n  +0.15 °Cwaste-heat feedback by 2040\n  3,064 → 3,516 MWpeak electricity"
-  },
-  {
-    "objectID": "index.html#what-this-is",
-    "href": "index.html#what-this-is",
-    "title": "Anthropogenic heat and air-conditioner adoption in Greater Mumbai",
-    "section": "What this is",
-    "text": "What this is\nTwo models, coupled.\nA bottom-up urban building energy model. Building footprints and heights become a stock of typed archetypes. Each carries an appliance load and a cooling load driven by outdoor temperature, and each rejects waste heat to the street: base electricity roughly one-to-one, plus condenser heat of Qcool(1 + 1/COP). Human metabolism and road traffic are added, and the total is aggregated to a 100 m grid at hourly resolution.\nAn agent-based model of who buys an air conditioner. Households are agents. Each year, every household without an AC decides whether to buy one, based on what it can afford, how hot its own dwelling gets, and how many of its neighbours already have one. Those that own one choose a setpoint and how long to run it. The resulting waste heat raises the city’s temperature, which raises next year’s discomfort — the loop that makes this an ABM rather than a projection."
-  },
-  {
-    "objectID": "index.html#what-it-shows",
-    "href": "index.html#what-it-shows",
-    "title": "Anthropogenic heat and air-conditioner adoption in Greater Mumbai",
-    "section": "What it shows",
-    "text": "What it shows\nThe city-scale magnitude checks out. Qf over built cells comes to 20.58 W/m² against 23.5 W/m² from the published extrapolation for Mumbai, but peaks at 18:00 rather than 16:00. That two-hour gap is the substantive result: the benchmark’s diurnal shape comes from US utility load curves, while Indian residential demand peaks in the evening.\nAdoption roughly triples by 2040, adding 3.2 W/m² of waste heat and 452 MW of peak demand, with no population growth or new construction in the model.\nThermal inequality is measurable and it runs the wrong way. Informal dwellings sit 1.6 °C hotter on average and 4.0 °C hotter at peak than tower flats, carry 65% more discomfort degree-hours, and run cooling at 64% of the rate. The heat they are exposed to outdoors is produced largely by other people’s machines.\nThe two mechanisms are separable. Sensitivity screening puts affordability and the baseline purchase rate at the top and indoor discomfort near the bottom for adoption, while discomfort produces the largest spread across the stock. Income and price decide who adopts; building fabric decides who suffers while not adopting.\n\nThis is an uncalibrated prototype. The building physics and the agent logic are real; the behavioural coefficients are not fitted to observation, and the two that dominate the result have no empirical anchor. Treat trajectories as structural, not predictive. See Limits."
-  },
-  {
-    "objectID": "index.html#built-in-a-day",
-    "href": "index.html#built-in-a-day",
-    "title": "Anthropogenic heat and air-conditioner adoption in Greater Mumbai",
-    "section": "Built in a day",
-    "text": "Built in a day\nThe whole pipeline — data assembly, energy model, thermal model, ABM, sensitivity screening, web map — was built in a single session on 19 September 2026, then paused for documentation. Reproduce has the commands."
-  },
-  {
-    "objectID": "abm.html",
-    "href": "abm.html",
-    "title": "The agent-based model",
-    "section": "",
-    "text": "A spreadsheet can multiply an assumed penetration rate by a cooling load. Three things here need agents:\nHeterogeneity that interacts with the physics. The dwelling that gets hottest belongs to the household least able to buy cooling. That correlation determines the aggregate, and it cannot be recovered from city means.\nPeer effects. Adoption spreads through neighbourhoods. The share of nearby households already owning an AC enters each decision, so adoption compounds spatially instead of rising uniformly.\nA feedback loop. Waste heat raises outdoor temperature, which raises indoor temperature, which raises discomfort, which raises adoption. The loop only exists if the agents re-read their environment each year."
-  },
-  {
-    "objectID": "abm.html#why-agents",
-    "href": "abm.html#why-agents",
-    "title": "The agent-based model",
-    "section": "",
-    "text": "A spreadsheet can multiply an assumed penetration rate by a cooling load. Three things here need agents:\nHeterogeneity that interacts with the physics. The dwelling that gets hottest belongs to the household least able to buy cooling. That correlation determines the aggregate, and it cannot be recovered from city means.\nPeer effects. Adoption spreads through neighbourhoods. The share of nearby households already owning an AC enters each decision, so adoption compounds spatially instead of rising uniformly.\nA feedback loop. Waste heat raises outdoor temperature, which raises indoor temperature, which raises discomfort, which raises adoption. The loop only exists if the agents re-read their environment each year."
-  },
-  {
-    "objectID": "abm.html#agents",
-    "href": "abm.html#agents",
-    "title": "The agent-based model",
-    "section": "Agents",
-    "text": "Agents\nOne household cohort per residential building: an integer count of households, of which an integer count own an air conditioner. That makes 3.2 million household agents cost two integer arrays rather than three million Python objects.\n\n\n\n\n\n\n\nattribute\nsource\n\n\n\n\nhouseholds\nward population → residential floor area → archetype occupancy\n\n\nincome band\nready-reckoner quartile, slums pinned to the lowest\n\n\narchetype\ntypology + floor count + slum flag\n\n\nindoor temperature, discomfort\n1R1C model on that building’s fabric\n\n\nAC ownership\nstate variable, updated annually\n\n\nsetpoint, runtime\nchosen from income band and indoor exceedance"
-  },
-  {
-    "objectID": "abm.html#the-decision",
-    "href": "abm.html#the-decision",
-    "title": "The agent-based model",
-    "section": "The decision",
-    "text": "The decision\nEach year, every household without an AC draws against\n\\[\nu = \\beta_0 + \\beta_a (\\text{afford} - 1) + \\beta_d \\left(\\frac{\\text{discomfort}_i}{\\text{discomfort}_\\text{ref}} - 1\\right) + \\beta_p\\, \\text{peer}_i\n\\]\n\\[\np_i = \\frac{p_\\text{cap}}{1 + e^{-u}}\n\\]\n\nafford rises with real income growth against a falling real AC price, scaled down at low income bands (the same price is a larger barrier further down the distribution).\ndiscomforti is that agent’s own indoor degree-hours above the comfort threshold, including any warming the city has caused itself.\npeeri is the share of households owning an AC within the agent’s neighbourhood, computed on a 500 m grid with 3×3 smoothing rather than a radius query — the calculation repeats every simulated year over 580,890 buildings.\n\nAdoption is a binomial draw on the non-owning households, so penetration is an output. Nothing forces the trajectory toward a target."
-  },
-  {
-    "objectID": "abm.html#operation",
-    "href": "abm.html#operation",
-    "title": "The agent-based model",
-    "section": "Operation",
-    "text": "Operation\nOwnership is a weak proxy for heat output: a household cooling one room for two hours a night and one cooling a whole flat for ten differ fourfold. Two behavioural variables close that gap.\nSetpoint falls with income band (27 °C at the bottom, 24 °C at the top). Runtime is logistic in mean indoor exceedance above the setpoint, damped by a bill sensitivity that is lower for poorer households. Both are read back by the load model.\n\n\n\n\n\n\n\n\n\npenetration %\nmean runtime\nQf mean W/m²\nΔT °C\npeak MW\n\n\nyear\n\n\n\n\n\n\n\n\n\n2026\n17.9\n0.60\n20.58\n0.00\n3064\n\n\n2027\n19.4\n0.60\n20.70\n0.00\n3081\n\n\n2028\n21.1\n0.60\n20.84\n0.01\n3101\n\n\n2029\n22.9\n0.60\n21.00\n0.01\n3123\n\n\n2030\n24.9\n0.60\n21.18\n0.02\n3148\n\n\n2031\n27.1\n0.60\n21.37\n0.03\n3175\n\n\n2032\n29.6\n0.60\n21.58\n0.04\n3204\n\n\n2033\n32.2\n0.60\n21.81\n0.05\n3237\n\n\n2034\n35.1\n0.60\n22.07\n0.06\n3272\n\n\n2035\n38.3\n0.60\n22.34\n0.07\n3309\n\n\n2036\n41.6\n0.60\n22.62\n0.09\n3349\n\n\n2037\n45.1\n0.60\n22.92\n0.10\n3390\n\n\n2038\n48.7\n0.60\n23.22\n0.12\n3432\n\n\n2039\n52.4\n0.61\n23.51\n0.13\n3475\n\n\n2040\n56.2\n0.61\n23.81\n0.15\n3516\n\n\n\n\n\n\n\nThe city-wide mean runtime is where the inequality shows up in aggregate: it dropped from 0.74 to 0.60 the moment 284,216 buildings were reclassified as informal, because those households sit in the highest-setpoint, most bill-sensitive group. Operation behaviour, not ownership, did that."
-  },
-  {
-    "objectID": "abm.html#what-the-model-is-not",
-    "href": "abm.html#what-the-model-is-not",
-    "title": "The agent-based model",
-    "section": "What the model is not",
-    "text": "What the model is not\nIt has no replacement cycle (units are bought, never retired), no explicit tariff slabs, no tenure split between owners and renters, and no change in the building stock — no redevelopment, no new construction, no population growth. Commercial and industrial cooling is a fixed fraction per archetype and sits outside the ABM entirely, despite being 43% of modelled energy."
   }
 ]

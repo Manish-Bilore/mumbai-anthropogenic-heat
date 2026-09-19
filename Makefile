@@ -27,6 +27,14 @@ bench:
 tiles:
 	bash scripts/07_make_tiles.sh
 
+web:
+	$(PY) scripts/12_export_web_series.py
+	$(PY) scripts/14_export_diurnal.py
+	$(PY) scripts/15_render_poster.py
+
+site: web
+	quarto render
+
 demo: sample stock pop loads grid abm bench
 	@echo "demo pipeline complete - see data/processed and figures/"
 

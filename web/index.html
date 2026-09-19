@@ -2,171 +2,496 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Mumbai anthropogenic heat — AC adoption 2026–2040</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Explore the map — Mumbai Heat</title>
+<meta name="description" content="Hourly anthropogenic heat on a 100 m grid for Greater Mumbai, 2026–2040, from a building energy model coupled to an AC-adoption agent-based model." />
+<meta name="theme-color" content="#171716" />
 <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script src="https://unpkg.com/pmtiles@3.0.6/dist/pmtiles.js"></script>
+<link rel="stylesheet" href="heat.css" />
+<script src="heat.js"></script>
 <style>
-  :root { --bg:#0f1115; --panel:#191c23; --line:#262b35; --text:#e8eaf0; --muted:#98a0b3; --accent:#ffb454; }
-  html,body { margin:0; height:100%; background:var(--bg); color:var(--text);
-              font:14px/1.45 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
-  #map { position:absolute; inset:0; }
-  .panel { position:absolute; top:12px; left:12px; width:300px; max-width:calc(100vw - 24px);
-           background:var(--panel); border:1px solid var(--line); border-radius:10px;
-           padding:14px 16px; box-shadow:0 6px 24px rgba(0,0,0,.45); z-index:2;
-           max-height:calc(100vh - 24px); overflow:auto; }
-  h1 { font-size:15px; margin:0 0 2px; }
-  p.sub { margin:0 0 12px; color:var(--muted); font-size:12px; }
-  label { display:block; font-size:12px; color:var(--muted); margin:10px 0 4px; }
-  input[type=range] { width:100%; accent-color:var(--accent); }
-  .val { color:var(--accent); font-variant-numeric:tabular-nums; }
-  .stats { margin-top:12px; border-top:1px solid var(--line); padding-top:10px;
-           display:grid; grid-template-columns:1fr auto; gap:3px 10px; font-size:12px; }
-  .stats .k { color:var(--muted); }
-  .stats .v { font-variant-numeric:tabular-nums; }
-  .legend { margin-top:12px; border-top:1px solid var(--line); padding-top:10px; font-size:12px; }
-  .swatch { display:inline-block; width:14px; height:10px; margin-right:6px; border-radius:2px; }
-  .note { margin-top:10px; font-size:11px; color:var(--muted); }
-  .note a { color:var(--accent); }
+  html, body { margin: 0; height: 100%; background: var(--ink); color: var(--paper); font: 14px/1.45 var(--sans); overflow: hidden; }
+  a { color: inherit; }
+  #map { position: absolute; inset: 0; background: var(--ink); }
+  .maplibregl-ctrl-attrib { background: rgba(23,23,22,.7) !important; color: var(--stone) !important; font: 10px var(--sans); }
+  .maplibregl-ctrl-attrib a { color: var(--stone) !important; }
+  .maplibregl-ctrl-group { background: var(--ink-2); border-radius: 0; box-shadow: none; border: 1px solid var(--rule-dark); }
+  .maplibregl-ctrl-group button + button { border-top: 1px solid var(--rule-dark); }
+  .maplibregl-ctrl-group button .maplibregl-ctrl-icon { filter: invert(.92) sepia(.2); }
+  .maplibregl-ctrl-bottom-right { bottom: var(--rail-h); }
+
+  /* ---------- masthead ---------- */
+  .mast { position: absolute; z-index: 5; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 18px;
+          padding: 14px 20px; pointer-events: none;
+          background: linear-gradient(180deg, rgba(23,23,22,.92) 0%, rgba(23,23,22,.6) 60%, rgba(23,23,22,0) 100%); }
+  .mast > * { pointer-events: auto; }
+  .brand { font: 700 13px/1 var(--sans); letter-spacing: .16em; text-transform: uppercase; text-decoration: none; }
+  .brand span { color: var(--h3); }
+  .crumb { color: var(--stone); }
+  .mast .sp { flex: 1; }
+  .mast .back { font: 500 12px var(--sans); text-decoration: none; color: var(--sand); border-bottom: 1px solid var(--rule-dark); padding-bottom: 2px; }
+  .mast .back:hover { color: var(--paper); border-color: var(--paper); }
+
+  /* ---------- state headline ---------- */
+  .state { position: absolute; z-index: 4; top: 62px; left: 20px; max-width: 440px; }
+  .state .eyebrow { color: var(--stone); }
+  .state h1 { font: 400 clamp(30px, 3.4vw, 46px)/1.02 var(--serif); letter-spacing: -.01em; margin: 8px 0 14px;
+              text-shadow: 0 0 20px var(--ink); font-variation-settings: "opsz" 72; }
+  .state h1 em { font-style: italic; color: var(--h4); }
+  .modes { display: inline-flex; border: 1px solid var(--rule-dark); background: rgba(23,23,22,.75); }
+  .modes button { all: unset; cursor: pointer; font: 500 12px var(--sans); padding: 8px 12px; color: var(--sand); }
+  .modes button[aria-pressed="true"] { background: var(--paper); color: var(--ink); }
+  .modes button:focus-visible { outline: 2px solid var(--h4); outline-offset: -2px; }
+  .infobtn { all: unset; cursor: pointer; margin-left: 8px; font: 500 12px var(--sans); color: var(--sand); border-bottom: 1px dotted var(--stone); }
+  .infobtn:focus-visible { outline: 2px solid var(--h4); }
+
+  /* ---------- explainer ---------- */
+  .intro { position: absolute; z-index: 6; top: 300px; left: 20px; width: 340px; background: var(--paper); color: var(--ink);
+           padding: 18px 20px 16px; box-shadow: 0 20px 50px rgba(0,0,0,.45); }
+  .intro[hidden] { display: none; }
+  .intro .eyebrow { color: var(--h1); }
+  .intro p { margin: 10px 0; font: 400 15px/1.5 var(--serif); }
+  .intro ul { margin: 0 0 12px; padding: 0; list-style: none; font-size: 13px; color: var(--stone-dark); }
+  .intro li { padding: 5px 0; border-top: 1px solid var(--rule-light); }
+  .intro li b { color: var(--ink); font-weight: 600; }
+  .intro button { all: unset; cursor: pointer; font: 600 12px var(--sans); background: var(--ink); color: var(--paper); padding: 8px 14px; }
+  .intro button:focus-visible { outline: 2px solid var(--h2); outline-offset: 2px; }
+
+  /* ---------- control rail ---------- */
+  :root { --rail-h: 200px; }
+  .rail { position: absolute; z-index: 5; left: 0; right: 0; bottom: 0; height: var(--rail-h);
+          display: grid; grid-template-columns: 268px minmax(0, 1fr) 300px;
+          background: rgba(23,23,22,.94); border-top: 1px solid var(--rule-dark); backdrop-filter: blur(6px); }
+  .rail > div { padding: 16px 20px 14px; min-width: 0; }
+  .rail > div + div { border-left: 1px solid var(--rule-dark); }
+  .rail .eyebrow { color: var(--stone); display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+
+  .years { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 12px; border: 1px solid var(--rule-dark); }
+  .years button { all: unset; cursor: pointer; padding: 10px 0 9px; text-align: center; position: relative; }
+  .years button + button { border-left: 1px solid var(--rule-dark); }
+  .years .y { display: block; font: 500 15px/1 var(--sans); }
+  .years .p { display: block; font: 400 10.5px/1 var(--mono); color: var(--stone); margin-top: 5px; }
+  .years button[aria-pressed="true"] { background: var(--paper); color: var(--ink); }
+  .years button[aria-pressed="true"] .p { color: var(--stone-dark); }
+  .years button::after { content: ""; position: absolute; left: 0; bottom: 0; height: 3px; width: 100%; background: var(--c); }
+  .years button:focus-visible { outline: 2px solid var(--h4); outline-offset: -2px; }
+  .play { all: unset; cursor: pointer; margin-top: 12px; font: 500 12px var(--sans); color: var(--h4); display: inline-flex; gap: 8px; align-items: center; }
+  .play svg { width: 10px; height: 10px; fill: currentColor; }
+  .play:focus-visible { outline: 2px solid var(--h4); outline-offset: 3px; }
+  .play-note { font-size: 11px; color: var(--stone); margin-top: 4px; }
+
+  .hourhead { display: flex; align-items: baseline; gap: 12px; }
+  .hourhead .big { font: 400 26px/1 var(--serif); }
+  .hourhead .sub { color: var(--stone); font-size: 12px; }
+  .chartbox { height: calc(var(--rail-h) - 70px); margin-top: 6px; color: var(--paper); }
+
+  .readout .qf { display: flex; align-items: baseline; gap: 6px; margin-top: 8px; }
+  .readout .qf .v { font: 400 34px/1 var(--serif); color: var(--h4); }
+  .readout .qf .u { font-size: 12px; color: var(--sand); }
+  .readout .qf .d { margin-left: auto; font: 500 11px var(--mono); color: var(--h3); }
+  .stats { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; font-size: 12px; margin: 12px 0 0; }
+  .stats .k { color: var(--stone); }
+  .stats .v { text-align: right; }
+  .stats .v small { color: var(--h3); font: 500 10px var(--mono); margin-left: 6px; }
+  .state .legend { width: 320px; max-width: 100%; margin-top: 16px; }
+  .legend .bar { display: flex; height: 8px; }
+  .legend .bar i { flex: 1; }
+  .legend .ticks { position: relative; height: 14px; font: 400 9.5px var(--mono); color: var(--stone); margin-top: 3px; }
+  .legend .ticks span { position: absolute; transform: translateX(-50%); }
+  .legend .unit { font: 400 10px var(--mono); color: var(--stone); margin-top: 1px; }
+
+  /* ---------- inspector ---------- */
+  .inspector { position: absolute; z-index: 6; top: 62px; right: 20px; width: 300px; background: var(--ink-2);
+               border: 1px solid var(--rule-dark); padding: 16px 18px 14px; box-shadow: 0 20px 50px rgba(0,0,0,.5); }
+  .inspector[hidden] { display: none; }
+  .inspector .x { all: unset; cursor: pointer; position: absolute; top: 10px; right: 12px; font-size: 18px; color: var(--stone); }
+  .inspector .x:focus-visible { outline: 2px solid var(--h4); }
+  .inspector .eyebrow { color: var(--stone); }
+  .inspector .hv { font: 400 40px/1 var(--serif); margin: 10px 0 2px; color: var(--h4); }
+  .inspector .hv small { font: 400 13px var(--sans); color: var(--sand); }
+  .inspector .hs { font-size: 12px; color: var(--stone); }
+  .inspector h3 { font: 500 10.5px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--stone); margin: 16px 0 8px; }
+  .ybars div { display: grid; grid-template-columns: 38px 1fr 54px; align-items: center; gap: 8px; font-size: 12px; padding: 2px 0; }
+  .ybars .track { height: 8px; background: rgba(244,240,232,.06); }
+  .ybars .fill { height: 100%; transition: width 400ms var(--ease); }
+  .ybars .cur { color: var(--paper); font-weight: 600; }
+  .ybars div:not(.cur) { color: var(--stone); }
+  .ybars .n { text-align: right; }
+  .cellchart { height: 96px; color: var(--paper); }
+  .inspector .ctx { font-size: 11.5px; color: var(--stone); margin-top: 8px; line-height: 1.4; }
+
+  .status-wrap { display: flex; align-items: center; gap: 14px; }
+
+  /* ---------- small screens: map first, controls in a bottom sheet ---------- */
+  @media (max-width: 860px) {
+    :root { --rail-h: 292px; }
+    .state { padding-bottom: 8px; }
+    .state .eyebrow { display: none; }
+    #chartYearLbl { display: none; }
+    .years button { padding: 8px 0 7px; }
+    .play { margin-top: 8px; }
+    .mast { padding: 10px 14px; gap: 10px; }
+    .crumb, .mast .back { display: none; }
+    .status-badge { padding: 5px 7px; font-size: 9.5px; }
+    .state { top: 42px; left: 0; right: 0; padding: 0 14px 10px; background: linear-gradient(180deg, rgba(23,23,22,.9) 70%, rgba(23,23,22,0)); }
+    .state h1 { font-size: 24px; margin: 2px 0 8px; }
+    .state .legend { width: 100%; margin-top: 10px; }
+    .infobtn { display: none; }
+    .rail { grid-template-columns: 1fr; grid-template-rows: auto 1fr; height: var(--rail-h); }
+    .rail > div { padding: 10px 14px; }
+    .rail > div + div { border-left: 0; border-top: 1px solid var(--rule-dark); }
+    .rail .readout { display: none; }
+    .years { margin-top: 8px; }
+    .play-note { display: none; }
+    .rail .yearbox { display: grid; grid-template-columns: 1fr; }
+    .chartbox { height: 84px; }
+    .dm { display: none; }
+    .hourhead .big { font-size: 22px; }
+    .mobile-read { margin-top: 4px; }
+    .intro { top: auto; bottom: calc(var(--rail-h) + 12px); left: 14px; right: 14px; width: auto; }
+    .inspector { top: auto; bottom: 0; left: 0; right: 0; width: auto; border-left: 0; border-right: 0; z-index: 7; }
+    .mobile-read { display: flex !important; }
+  }
+  .mobile-read { display: none; gap: 16px; font-size: 11.5px; color: var(--stone); margin-top: 8px; }
+  .mobile-read b { color: var(--paper); font-weight: 500; }
 </style>
 </head>
 <body>
-<div id="map"></div>
-<div class="panel">
-  <h1>Mumbai anthropogenic heat</h1>
-  <p class="sub">Typical pre-monsoon day · AC-adoption ABM · placeholder parameters, uncalibrated</p>
+<div id="map" role="region" aria-label="Map of hourly anthropogenic heat in Greater Mumbai"></div>
 
-  <label>Year: <span class="val" id="yearLabel">2026</span></label>
-  <input type="range" id="year" min="0" max="3" value="0" step="1" />
+<header class="mast">
+  <a class="brand" href="../">Mumbai <span>Heat</span></a>
+  <span class="crumb eyebrow">/ Explore the grid</span>
+  <span class="sp"></span>
+  <div class="status-wrap">
+    <a class="back" href="../">← Read the story</a>
+    <a class="status-badge" href="../limitations.html" title="Behavioural coefficients are not fitted to observation. Read the limits.">Uncalibrated prototype</a>
+  </div>
+</header>
 
-  <label>Hour (IST): <span class="val" id="hourLabel">18:00</span></label>
-  <input type="range" id="hour" min="0" max="23" value="18" step="1" />
-
-  <div class="stats" id="stats"></div>
-
+<section class="state" aria-live="polite">
+  <div class="eyebrow" id="stateEyebrow">Heat released to the street · typical pre-monsoon day</div>
+  <h1 id="stateTitle">Mumbai, <em>2026</em><br />hour ending 18:00</h1>
+  <div>
+    <span class="modes" role="group" aria-label="Map layer">
+      <button type="button" data-mode="qf" aria-pressed="true">Heat released</button>
+      <button type="button" data-mode="dq" aria-pressed="false">Added since 2026</button>
+    </span>
+    <button type="button" class="infobtn" id="infoBtn" aria-controls="intro">What am I looking at?</button>
+  </div>
   <div class="legend" id="legend"></div>
+</section>
 
-  <div class="note">
-    Q<sub>f</sub> = building electricity + condenser rejection Q<sub>cool</sub>(1+1/COP)
-    + human metabolism + road traffic. Households adopt ACs year by year from income,
-    discomfort and neighbours; waste heat feeds back as &Delta;T into the next year's
-    cooling demand. Industrial process heat and daytime population movement are not modelled.
-    <a href="https://github.com/Manish-Bilore/mumbai-anthropogenic-heat">source</a>
-    <span id="hash"></span>
+<section class="intro" id="intro" hidden aria-labelledby="introH">
+  <div class="eyebrow" id="introH">What you're seeing</div>
+  <p>Each square is a 100 × 100 m cell. Its colour is the anthropogenic heat flux, Q<sub>f</sub>: the waste heat that buildings, air conditioners, people and traffic release into the outdoor air.</p>
+  <ul>
+    <li><b>Brighter = more waste heat</b>, in watts per square metre of ground.</li>
+    <li><b>Year</b> steps the adoption model: households buy ACs 2026 → 2040.</li>
+    <li><b>Hour</b> — drag the curve. The city peaks in the hour ending 18:00.</li>
+    <li><b>Click a cell</b> for its value across years and hours.</li>
+    <li>Empty areas (SGNP, Aarey, creeks) have no buildings.</li>
+  </ul>
+  <button type="button" id="introOk">Got it</button>
+</section>
+
+<aside class="inspector" id="inspector" hidden aria-live="polite" aria-label="Selected cell">
+  <button type="button" class="x" id="inspClose" aria-label="Close">×</button>
+  <div class="eyebrow" id="inspWhere">100 m cell</div>
+  <div class="hv num"><span id="inspVal">–</span> <small>W/m²</small></div>
+  <div class="hs" id="inspWhen">–</div>
+  <h3>This hour, each model year</h3>
+  <div class="ybars" id="inspYears"></div>
+  <h3 id="inspDayH">24 hours</h3>
+  <div class="cellchart" id="cellChart"></div>
+  <div class="ctx" id="inspCtx"></div>
+</aside>
+
+<div class="rail" role="group" aria-label="Model controls">
+  <div class="yearbox">
+    <div class="eyebrow"><span>Model year</span><span>AC penetration</span></div>
+    <div class="years" id="years"></div>
+    <div>
+      <button type="button" class="play" id="play" aria-pressed="false">
+        <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 0l9 5-9 5z" /></svg><span>Run 2026 → 2040</span>
+      </button>
+      <div class="play-note">Steps the adoption model; only the heat layer changes.</div>
+    </div>
+  </div>
+  <div>
+    <div class="eyebrow"><span>City mean over the day<span class="dm"> · drag to set the hour</span></span><span id="chartYearLbl"></span></div>
+    <div class="hourhead"><span class="big num" id="hourBig">17:00–18:00</span><span class="sub" id="hourSub">daily peak</span></div>
+    <div class="chartbox" id="dayChart"></div>
+    <div class="mobile-read" id="mobileRead"></div>
+  </div>
+  <div class="readout">
+    <div class="eyebrow"><span>Q<sub>f</sub> daily mean · built cells</span></div>
+    <div class="qf"><span class="v num" id="qfVal">20.58</span><span class="u">W/m²</span><span class="d" id="qfDelta"></span></div>
+    <div class="stats" id="stats"></div>
   </div>
 </div>
 
 <script>
-let YEARS  = [2026, 2030, 2035, 2040];
-let SERIES = {};                       // filled from ./series.json (written by scripts/12)
-let META   = {};
+(() => {
+  const H = window.HEAT;
+  const OP = 0.88;
+  const $ = (id) => document.getElementById(id);
+  const S = { yi: 0, hour: H.PEAK, mode: "qf", cell: null, playing: false };
+  let SERIES = {}, DIURNAL = null, META = {};
 
-async function loadSeries() {
-  try {
-    const r = await fetch("./series.json", { cache: "no-store" });
-    if (!r.ok) throw new Error(r.status);
-    const j = await r.json();
-    YEARS = j.years;
-    SERIES = j.series;
-    META = j.meta || {};
-    document.getElementById("year").max = String(YEARS.length - 1);
-  } catch (e) {
-    console.warn("series.json unavailable; stats panel disabled", e);
-  }
-}
+  // ---- state from URL hash: #y=2040&h=18&m=dq (h = hour ending) ----
+  const hp = new URLSearchParams(location.hash.slice(1));
+  if (H.YEARS.includes(+hp.get("y"))) S.yi = H.YEARS.indexOf(+hp.get("y"));
+  if (+hp.get("h") >= 1 && +hp.get("h") <= 24) S.hour = +hp.get("h") - 1;
+  if (hp.get("m") === "dq") S.mode = "dq";
+  const year = () => H.YEARS[S.yi];
+  const writeHash = () => history.replaceState(null, "", `#y=${year()}&h=${S.hour + 1}${S.mode === "dq" ? "&m=dq" : ""}`);
 
-const BREAKS = [0, 8, 15, 25, 40, 60];
-const COLORS = ["#2b2f3a", "#31527d", "#2f8f9d", "#a8c256", "#f2a541", "#d1495b"];
-
-const protocol = new pmtiles.Protocol();
-maplibregl.addProtocol("pmtiles", protocol.tile);
-
-const map = new maplibregl.Map({
-  container: "map",
-  style: {
-    version: 8,
-    sources: {
-      osm: { type: "raster", tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
-             tileSize: 256, attribution: "© OpenStreetMap contributors" }
+  // ---- map ----
+  const protocol = new pmtiles.Protocol();
+  maplibregl.addProtocol("pmtiles", protocol.tile);
+  const map = new maplibregl.Map({
+    container: "map",
+    style: {
+      version: 8,
+      sources: {
+        base: { type: "raster", tileSize: 256, maxzoom: 19,
+                tiles: ["a", "b", "c", "d"].map((s) => `https://${s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png`),
+                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/attributions">CARTO</a> · footprints GlobalBuildingAtlas' }
+      },
+      layers: [
+        { id: "bg", type: "background", paint: { "background-color": "#171716" } },
+        { id: "base", type: "raster", source: "base",
+          paint: { "raster-opacity": 0.62, "raster-saturation": -1, "raster-contrast": 0.1 } }
+      ]
     },
-    layers: [{ id: "osm", type: "raster", source: "osm",
-               paint: { "raster-brightness-max": 0.45, "raster-saturation": -0.7 } }]
-  },
-  center: [72.88, 19.10],
-  zoom: 10.5
-});
-map.on("error", (e) => console.error("maplibre:", e && e.error));
+    center: [72.88, 19.08], zoom: 10.3,
+    maxBounds: [[72.45, 18.7], [73.3, 19.45]],
+    minZoom: 9.5, maxZoom: 16, attributionControl: { compact: true }
+  });
+  const mobile = matchMedia("(max-width: 860px)").matches;
+  map.fitBounds([[72.7779, 18.8937], [72.9793, 19.2691]], { duration: 0,
+    padding: mobile ? { top: 120, bottom: 300, left: 10, right: 10 } : { top: 60, bottom: 215, left: 40, right: 40 } });
+  map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
+  map.on("error", (e) => console.error("maplibre:", e && e.error));
+  H.addPlaces(map, maplibregl);
 
-const field = () => `y${YEARS[+document.getElementById("year").value]}_h`
-                    + String(document.getElementById("hour").value).padStart(2, "0");
+  let front = "qfA";
+  const expr = () => (S.mode === "qf" ? H.qfExpr : H.dqExpr)(year(), S.hour);
+  function paint(fade) {
+    if (!map.getLayer("qfA")) return;
+    if (!fade || H.reduce.matches) { map.setPaintProperty(front, "fill-color", expr()); return; }
+    const back = front === "qfA" ? "qfB" : "qfA";
+    map.setPaintProperty(back, "fill-color", expr());
+    map.setPaintProperty(back, "fill-opacity", OP);
+    map.setPaintProperty(front, "fill-opacity", 0);
+    front = back;
+  }
 
-function fillExpr(f) {
-  const e = ["interpolate", ["linear"], ["coalesce", ["get", f], 0]];
-  BREAKS.forEach((b, i) => e.push(b, COLORS[i]));
-  return e;
-}
-
-function refresh() {
-  const y = YEARS[+document.getElementById("year").value];
-  const h = document.getElementById("hour").value;
-  document.getElementById("yearLabel").textContent = y;
-  document.getElementById("hourLabel").textContent = String(h).padStart(2, "0") + ":00";
-
-  const s = SERIES[String(y)];
-  if (!s) { document.getElementById('stats').innerHTML = ''; return refreshLayer(); }
-  document.getElementById("stats").innerHTML = `
-    <div class="k">AC penetration</div><div class="v">${s.pen.toFixed(1)}%</div>
-    <div class="k">households with AC</div><div class="v">${s.hh.toFixed(2)} M</div>
-    <div class="k">Q<sub>f</sub> mean (built)</div><div class="v">${s.qf.toFixed(1)} W/m²</div>
-    <div class="k">Q<sub>f</sub> peak</div><div class="v">${s.peak.toFixed(1)} W/m²</div>
-    <div class="k">feedback ΔT</div><div class="v">+${s.dt.toFixed(2)} °C</div>
-    <div class="k">peak electricity</div><div class="v">${s.mw.toLocaleString()} MW</div>`;
-
-  refreshLayer();
-}
-
-function refreshLayer() {
-  if (map.getLayer("qf")) map.setPaintProperty("qf", "fill-color", fillExpr(field()));
-}
-
-map.on("load", async () => {
-  await loadSeries();
-  map.addSource("qf", { type: "vector", url: "pmtiles://./tiles/qf_years.pmtiles" });
-  map.addLayer({
-    id: "qf", type: "fill", source: "qf", "source-layer": "qf_years",
-    paint: { "fill-color": fillExpr(field()), "fill-opacity": 0.75 }
+  // ---- rail: years ----
+  H.YEARS.forEach((y, i) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.dataset.i = i;
+    b.style.setProperty("--c", H.YEAR_DARK[y]);
+    b.innerHTML = `<span class="y num">${y}</span><span class="p num" data-pen="${y}">–</span>`;
+    b.addEventListener("click", () => { stopPlay(); setYear(i, true); });
+    $("years").appendChild(b);
   });
 
-  map.on("click", "qf", (e) => {
-    const p = e.features[0].properties, y = YEARS[+document.getElementById("year").value];
-    const rows = YEARS.map(yy => {
-      const v = p[`y${yy}_h${String(document.getElementById("hour").value).padStart(2,"0")}`];
-      return `<tr><td style="padding-right:8px;${yy===y?"color:#ffb454":""}">${yy}</td>
-              <td style="text-align:right">${Number(v).toFixed(0)} W/m²</td></tr>`;
-    }).join("");
-    new maplibregl.Popup({ closeButton: false })
-      .setLngLat(e.lngLat)
-      .setHTML(`<table style="font:12px system-ui">${rows}</table>`)
-      .addTo(map);
+  // ---- rail: diurnal chart (map + curve + number move together) ----
+  const day = H.diurnal($("dayChart"), {
+    onScrub: (i) => setHour(i), surface: "#171716",
+    ariaLabel: "City-mean anthropogenic heat by hour for each model year; drag to set the hour",
+  });
+  const cellChart = H.diurnal($("cellChart"), { margin: { l: 26, b: 18 }, surface: "#211f1c",
+    onScrub: (i) => setHour(i), ariaLabel: "Selected cell, anthropogenic heat by hour" });
+
+  function drawDay() {
+    if (!DIURNAL) return;
+    const series = H.YEARS.map((y) => ({
+      id: y, label: String(y), values: DIURNAL.city_mean[y], color: H.YEAR_DARK[y],
+      width: y === year() ? 2.5 : 1.25, opacity: y === year() ? 1 : 0.4, main: y === year(),
+    }));
+    // draw selected year last so it sits on top
+    series.sort((a, b) => (a.main ? 1 : 0) - (b.main ? 1 : 0));
+    day.set({ series, hour: S.hour, yMax: 50,
+              marks: [{ i: H.PEAK, label: "peak", color: "#8f877a", anchor: "end" }] });
+    $("chartYearLbl").textContent = `mapped cells, n = ${DIURNAL.n_cells.toLocaleString("en-IN")}`;
+  }
+
+  // ---- readouts ----
+  function legend() {
+    const ramp = S.mode === "qf" ? H.RAMP_QF : H.RAMP_DQ;
+    const segs = ramp.slice(1);
+    let bar = "", ticks = "";
+    segs.forEach(([v, c], k) => {
+      const c0 = k === 0 ? "#2a1f1b" : segs[k - 1][1];
+      bar += `<i style="background:linear-gradient(90deg,${c0},${c})"></i>`;
+      if (k > 0) ticks += `<span style="left:${(k / segs.length) * 100}%">${segs[k - 1][0]}</span>`;
+    });
+    ticks += `<span style="left:100%;transform:translateX(-100%)">${segs[segs.length - 1][0]}+</span>`;
+    $("legend").innerHTML = `<div class="bar" aria-hidden="true">${bar}</div><div class="ticks">${ticks}</div>` +
+      `<div class="unit">${S.mode === "qf" ? "Q<sub>f</sub>, W/m² at this hour" : "Q<sub>f</sub> added since 2026, W/m² at this hour"}</div>`;
+  }
+
+  function readouts(animate) {
+    const y = year(), s = SERIES[y], b = SERIES[2026];
+    if (!s) return;
+    const tw = (el, v, dp) => animate ? H.tweenNumber(el, v, { dp }) : (el.dataset.v = v, el.textContent = v.toFixed(dp));
+    tw($("qfVal"), s.qf, 2);
+    $("qfDelta").textContent = y === 2026 ? "baseline" : `+${(s.qf - b.qf).toFixed(2)} vs 2026`;
+    const d = (v, dp, u = "") => (y === 2026 ? "" : `<small>+${v.toFixed(dp)}${u}</small>`);
+    $("stats").innerHTML = `
+      <div class="k">AC penetration</div><div class="v num">${s.pen.toFixed(1)}%${d(s.pen - b.pen, 1, " pp")}</div>
+      <div class="k">households with AC</div><div class="v num">${s.hh.toFixed(2)} M${d(s.hh - b.hh, 2)}</div>
+      <div class="k">Q<sub>f</sub> at peak hour</div><div class="v num">${s.peak.toFixed(1)} W/m²</div>
+      <div class="k">waste-heat feedback ΔT</div><div class="v num">+${s.dt.toFixed(2)} °C</div>
+      <div class="k">peak electricity</div><div class="v num">${s.mw.toLocaleString("en-IN")} MW${d(s.mw - b.mw, 0)}</div>`;
+    $("mobileRead").innerHTML = `<span>Q<sub>f</sub> <b class="num">${s.qf.toFixed(2)}</b> W/m²</span>` +
+      `<span>AC <b class="num">${s.pen.toFixed(1)}%</b></span><span>ΔT <b class="num">+${s.dt.toFixed(2)}</b> °C</span>`;
+  }
+
+  function headline() {
+    const y = year();
+    $("stateTitle").innerHTML = S.mode === "qf"
+      ? `Mumbai, <em>${y}</em><br />hour ending ${H.hourEnd(S.hour)}`
+      : (y === 2026 ? `Pick a later year<br />to see <em>added</em> heat`
+                    : `Heat added by <em>${y}</em><br />hour ending ${H.hourEnd(S.hour)}`);
+    $("stateEyebrow").textContent = S.mode === "qf"
+      ? "Heat released to the street · typical pre-monsoon day"
+      : "Waste heat from new ACs since 2026 · same hour, same buildings";
+    $("hourBig").textContent = H.hourSpan(S.hour);
+    $("hourSub").textContent = S.hour === H.PEAK ? "city-wide daily peak" : S.hour < 6 ? "night" : S.hour < 12 ? "morning" : S.hour < 17 ? "afternoon" : "evening";
+    document.querySelectorAll(".years button").forEach((b) => b.setAttribute("aria-pressed", String(+b.dataset.i === S.yi)));
+    document.querySelectorAll(".modes button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === S.mode)));
+  }
+
+  // ---- inspector ----
+  function inspector() {
+    const c = S.cell;
+    if (!c) { $("inspector").hidden = true; return; }
+    const p = c.props, y = year(), h = S.hour;
+    const v = +p[H.field(y, h)] || 0;
+    $("inspector").hidden = false;
+    $("inspWhere").textContent = `100 m cell · ${c.lat.toFixed(3)}°N ${c.lon.toFixed(3)}°E`;
+    $("inspVal").textContent = v >= 100 ? v.toFixed(0) : v.toFixed(1);
+    $("inspWhen").textContent = `${y} · ${H.hourSpan(h)}`;
+    const vals = H.YEARS.map((yy) => +p[H.field(yy, h)] || 0);
+    const mx = Math.max(1, ...vals);
+    $("inspYears").innerHTML = H.YEARS.map((yy, k) => `
+      <div class="${yy === y ? "cur" : ""}"><span class="num">${yy}</span>
+      <span class="track"><span class="fill" style="display:block;width:${(vals[k] / mx) * 100}%;background:${H.YEAR_DARK[yy]}"></span></span>
+      <span class="n num">${vals[k].toFixed(1)}</span></div>`).join("");
+    const cellDay = Array.from({ length: 24 }, (_, i) => +p[H.field(y, i)] || 0);
+    $("inspDayH").textContent = `24 hours in ${y}`;
+    const series = [{ id: "c", label: "this cell", values: cellDay, color: H.YEAR_DARK[y], width: 2, main: true }];
+    if (DIURNAL) series.unshift({ id: "m", label: "city mean", values: DIURNAL.city_mean[y], color: "#8f877a", width: 1.25, dash: "3 3" });
+    cellChart.set({ series, hour: h, yMax: null });
+    const cm = DIURNAL ? DIURNAL.city_mean[y][h] : null;
+    const add = v - (+p[H.field(2026, h)] || 0);
+    $("inspCtx").innerHTML = (cm ? `${(v / cm).toFixed(1)}× the city-mean cell at this hour. ` : "") +
+      (y > 2026 ? `+${add.toFixed(1)} W/m² since 2026 from new ACs.` : "");
+  }
+
+  // ---- state setters ----
+  function setYear(i, animate) {
+    if (i === S.yi) return;
+    S.yi = i;
+    paint(animate); headline(); drawDay(); readouts(animate); inspector(); writeHash();
+  }
+  function setHour(i) {
+    if (i === S.hour) return;
+    S.hour = i;
+    paint(false); headline(); day.set({ hour: i }); inspector(); writeHash();
+  }
+  function setMode(m) {
+    if (m === S.mode) return;
+    S.mode = m;
+    paint(true); headline(); legend(); writeHash();
+  }
+  document.querySelectorAll(".modes button").forEach((b) => b.addEventListener("click", () => setMode(b.dataset.mode)));
+
+  // ---- play: 2026 → 2040, one model step at a time ----
+  let timer = null;
+  function stopPlay() {
+    clearTimeout(timer); S.playing = false;
+    $("play").setAttribute("aria-pressed", "false");
+    $("play").querySelector("span").textContent = "Run 2026 → 2040";
+    $("play").querySelector("path").setAttribute("d", "M1 0l9 5-9 5z");
+  }
+  function startPlay() {
+    S.playing = true;
+    $("play").setAttribute("aria-pressed", "true");
+    $("play").querySelector("span").textContent = "Stop";
+    $("play").querySelector("path").setAttribute("d", "M1 1h8v8H1z");
+    if (S.yi === H.YEARS.length - 1) setYear(0, false);
+    const step = () => {
+      if (!S.playing) return;
+      if (S.yi >= H.YEARS.length - 1) return stopPlay();
+      setYear(S.yi + 1, true);
+      timer = setTimeout(step, 1600);
+    };
+    timer = setTimeout(step, 700);
+  }
+  $("play").addEventListener("click", () => (S.playing ? stopPlay() : startPlay()));
+
+  // ---- keyboard ----
+  addEventListener("keydown", (e) => {
+    if (e.target.closest && e.target.closest("input, textarea")) return;
+    if (e.key === "ArrowRight" && !e.target.closest(".maplibregl-canvas")) { setHour(Math.min(23, S.hour + 1)); e.preventDefault(); }
+    else if (e.key === "ArrowLeft" && !e.target.closest(".maplibregl-canvas")) { setHour(Math.max(0, S.hour - 1)); e.preventDefault(); }
+    else if (e.key === "]") { stopPlay(); setYear(Math.min(3, S.yi + 1), true); }
+    else if (e.key === "[") { stopPlay(); setYear(Math.max(0, S.yi - 1), true); }
+    else if (e.key === "Escape") { S.cell = null; inspector(); clearSel(); }
   });
 
-  refresh();
-});
+  // ---- explainer, remembered per browser ----
+  let seen = false;
+  try { seen = localStorage.getItem("mah.intro.v1") === "1"; } catch (_) {}
+  $("intro").hidden = seen;
+  $("introOk").addEventListener("click", () => { $("intro").hidden = true; try { localStorage.setItem("mah.intro.v1", "1"); } catch (_) {} });
+  $("infoBtn").addEventListener("click", () => { $("intro").hidden = !$("intro").hidden; });
 
-document.getElementById("legend").innerHTML =
-  "<div>Q<sub>f</sub> (W m<sup>-2</sup>)</div>" +
-  BREAKS.map((b, i) => `<div><span class="swatch" style="background:${COLORS[i]}"></span>` +
-    `${b}${i === BREAKS.length - 1 ? "+" : "–" + BREAKS[i + 1]}</div>`).join("");
+  function clearSel() { const src = map.getSource("sel"); if (src) src.setData({ type: "FeatureCollection", features: [] }); }
+  $("inspClose").addEventListener("click", () => { S.cell = null; inspector(); clearSel(); });
 
-loadSeries().then(() => {
-  refresh();
-  if (META.config_hash)
-    document.getElementById("hash").textContent = " · config " + META.config_hash;
-});
+  // ---- data + layers ----
+  const jget = (u) => fetch(u, { cache: "no-store" }).then((r) => (r.ok ? r.json() : Promise.reject(r.status)));
+  const dataReady = Promise.all([
+    jget("./series.json").then((j) => { SERIES = j.series; META = j.meta || {}; }).catch((e) => console.warn("series.json", e)),
+    jget("./diurnal.json").then((j) => { DIURNAL = j; }).catch((e) => console.warn("diurnal.json", e)),
+  ]).then(() => {
+    H.YEARS.forEach((y) => { const el = document.querySelector(`[data-pen="${y}"]`); if (el && SERIES[y]) el.textContent = SERIES[y].pen.toFixed(1) + "%"; });
+    headline(); drawDay(); readouts(false); legend();
+  });
 
-document.getElementById("year").addEventListener("input", refresh);
-document.getElementById("hour").addEventListener("input", refresh);
+  map.on("load", () => {
+    map.addSource("qf", { type: "vector", url: "pmtiles://./tiles/qf_years.pmtiles" });
+    const before = undefined;
+    ["qfA", "qfB"].forEach((id) => map.addLayer({
+      id, type: "fill", source: "qf", "source-layer": "qf_years",
+      paint: { "fill-color": expr(), "fill-opacity": id === front ? OP : 0,
+               "fill-opacity-transition": { duration: 550, delay: 0 }, "fill-antialias": false }
+    }, before));
+    map.addSource("sel", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+    map.addLayer({ id: "sel", type: "line", source: "sel", paint: { "line-color": "#f4f0e8", "line-width": 2 } });
+
+    map.on("click", (e) => {
+      const f = map.queryRenderedFeatures(e.point, { layers: [front] })[0];
+      if (!f) { S.cell = null; inspector(); clearSel(); return; }
+      S.cell = { props: f.properties, lon: e.lngLat.lng, lat: e.lngLat.lat };
+      map.getSource("sel").setData({ type: "Feature", geometry: f.geometry, properties: {} });
+      inspector();
+    });
+    map.on("mousemove", (e) => {
+      map.getCanvas().style.cursor = map.queryRenderedFeatures(e.point, { layers: [front] }).length ? "pointer" : "";
+    });
+  });
+
+  headline(); legend();
+})();
 </script>
 </body>
 </html>

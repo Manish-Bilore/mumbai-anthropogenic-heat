@@ -2,7 +2,7 @@ project:
   type: website
   output-dir: docs
   post-render:
-    - bash scripts/13_copy_map.sh
+    - bash scripts/13_copy_map.sh   # viewer -> docs/map/, story -> docs/index.html
 
 website:
   title: "Mumbai Anthropogenic Heat"
@@ -13,8 +13,10 @@ website:
   page-navigation: true
   navbar:
     left:
+      - text: Story
+        href: index.html
       - text: Overview
-        href: index.qmd
+        href: overview.qmd
       - text: Method
         href: method.qmd
       - text: The ABM
@@ -22,7 +24,7 @@ website:
       - text: Results
         href: results.qmd
       - text: Map
-        href: map.qmd
+        href: map/index.html
       - text: Data
         href: data.qmd
       - text: Limits

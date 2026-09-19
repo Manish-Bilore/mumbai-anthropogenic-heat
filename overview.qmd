@@ -1,5 +1,6 @@
 ---
 title: "Anthropogenic heat and air-conditioner adoption in Greater Mumbai"
+pagetitle: "Overview"
 subtitle: "A bottom-up urban building energy model coupled to a household agent-based model"
 ---
 
@@ -11,6 +12,8 @@ afford cooling live in the dwellings that get hottest.
 This project quantifies both halves of that sentence for all 580,890 buildings inside
 the 24 BMC wards.
 :::
+
+[← The visual story](index.html){.story-link} &nbsp; [Explore the map →](map/index.html){.story-link}
 
 ```{python}
 import json, pathlib
