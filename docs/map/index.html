@@ -5,122 +5,121 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Explore the map — Mumbai Heat</title>
 <meta name="description" content="Hourly anthropogenic heat on a 100 m grid for Greater Mumbai, 2026–2040, from a building energy model coupled to an AC-adoption agent-based model." />
-<meta name="theme-color" content="#171716" />
+<meta name="theme-color" content="#f6f3ee" />
 <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script src="https://unpkg.com/pmtiles@3.0.6/dist/pmtiles.js"></script>
 <link rel="stylesheet" href="heat.css" />
 <script src="heat.js"></script>
 <style>
-  html, body { margin: 0; height: 100%; background: var(--ink); color: var(--paper); font: 14px/1.45 var(--sans); overflow: hidden; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font: 14px/1.45 var(--sans); overflow: hidden; }
   a { color: inherit; }
-  #map { position: absolute; inset: 0; background: var(--ink); }
-  .maplibregl-ctrl-attrib { background: rgba(23,23,22,.7) !important; color: var(--stone) !important; font: 10px var(--sans); }
-  .maplibregl-ctrl-attrib a { color: var(--stone) !important; }
-  .maplibregl-ctrl-group { background: var(--ink-2); border-radius: 0; box-shadow: none; border: 1px solid var(--rule-dark); }
-  .maplibregl-ctrl-group button + button { border-top: 1px solid var(--rule-dark); }
-  .maplibregl-ctrl-group button .maplibregl-ctrl-icon { filter: invert(.92) sepia(.2); }
+  #map { position: absolute; inset: 0; background: var(--bg); }
+  .maplibregl-ctrl-attrib { background: rgba(255,253,249,.85) !important; color: var(--ink-3) !important; font: 10px var(--sans); }
+  .maplibregl-ctrl-attrib a { color: var(--ink-3) !important; }
+  .maplibregl-ctrl-group { background: var(--panel); border-radius: 0; box-shadow: var(--shadow); border: 1px solid var(--rule); }
+  .maplibregl-ctrl-group button + button { border-top: 1px solid var(--rule); }
   .maplibregl-ctrl-bottom-right { bottom: var(--rail-h); }
 
   /* ---------- masthead ---------- */
   .mast { position: absolute; z-index: 5; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 18px;
           padding: 14px 20px; pointer-events: none;
-          background: linear-gradient(180deg, rgba(23,23,22,.92) 0%, rgba(23,23,22,.6) 60%, rgba(23,23,22,0) 100%); }
+          background: linear-gradient(180deg, rgba(246,243,238,.96) 0%, rgba(246,243,238,.7) 60%, rgba(246,243,238,0) 100%); }
   .mast > * { pointer-events: auto; }
-  .brand { font: 700 13px/1 var(--sans); letter-spacing: .16em; text-transform: uppercase; text-decoration: none; }
-  .brand span { color: var(--h3); }
-  .crumb { color: var(--stone); }
+  .brand { font: 700 13px/1 var(--sans); letter-spacing: .14em; text-transform: uppercase; text-decoration: none; }
+  .brand span { color: var(--accent); }
+  .crumb { color: var(--ink-3); }
   .mast .sp { flex: 1; }
-  .mast .back { font: 500 12px var(--sans); text-decoration: none; color: var(--sand); border-bottom: 1px solid var(--rule-dark); padding-bottom: 2px; }
-  .mast .back:hover { color: var(--paper); border-color: var(--paper); }
+  .mast .back { font: 500 13px var(--sans); text-decoration: none; color: var(--ink-2); border-bottom: 1px solid var(--rule-strong); padding-bottom: 2px; }
+  .mast .back:hover { color: var(--ink); border-color: var(--ink); }
 
   /* ---------- state headline ---------- */
   .state { position: absolute; z-index: 4; top: 62px; left: 20px; max-width: 440px; }
-  .state .eyebrow { color: var(--stone); }
-  .state h1 { font: 400 clamp(30px, 3.4vw, 46px)/1.02 var(--serif); letter-spacing: -.01em; margin: 8px 0 14px;
-              text-shadow: 0 0 20px var(--ink); font-variation-settings: "opsz" 72; }
-  .state h1 em { font-style: italic; color: var(--h4); }
-  .modes { display: inline-flex; border: 1px solid var(--rule-dark); background: rgba(23,23,22,.75); }
-  .modes button { all: unset; cursor: pointer; font: 500 12px var(--sans); padding: 8px 12px; color: var(--sand); }
-  .modes button[aria-pressed="true"] { background: var(--paper); color: var(--ink); }
-  .modes button:focus-visible { outline: 2px solid var(--h4); outline-offset: -2px; }
-  .infobtn { all: unset; cursor: pointer; margin-left: 8px; font: 500 12px var(--sans); color: var(--sand); border-bottom: 1px dotted var(--stone); }
-  .infobtn:focus-visible { outline: 2px solid var(--h4); }
+  .state .eyebrow { color: var(--ink-3); }
+  .state h1 { font: 300 clamp(30px, 3.4vw, 46px)/1.05 var(--display); letter-spacing: -.02em; margin: 8px 0 14px;
+              text-shadow: 0 0 18px var(--bg), 0 0 6px var(--bg); }
+  .state h1 em { font-style: normal; font-weight: 500; color: var(--accent); }
+  .modes { display: inline-flex; border: 1px solid var(--rule-strong); background: var(--panel); }
+  .modes button { all: unset; cursor: pointer; font: 500 12.5px var(--sans); padding: 8px 12px; color: var(--ink-2); }
+  .modes button[aria-pressed="true"] { background: var(--ink); color: var(--panel); }
+  .modes button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .infobtn { all: unset; cursor: pointer; margin-left: 8px; font: 500 12.5px var(--sans); color: var(--ink-2); border-bottom: 1px dotted var(--ink-3); }
+  .infobtn:focus-visible { outline: 2px solid var(--accent); }
 
   /* ---------- explainer ---------- */
-  .intro { position: absolute; z-index: 6; top: 300px; left: 20px; width: 340px; background: var(--paper); color: var(--ink);
-           padding: 18px 20px 16px; box-shadow: 0 20px 50px rgba(0,0,0,.45); }
+  .intro { position: absolute; z-index: 6; top: 300px; left: 20px; width: 340px; background: var(--panel); color: var(--ink);
+           padding: 18px 20px 16px; box-shadow: var(--shadow); border: 1px solid var(--rule); }
   .intro[hidden] { display: none; }
-  .intro .eyebrow { color: var(--h1); }
-  .intro p { margin: 10px 0; font: 400 15px/1.5 var(--serif); }
-  .intro ul { margin: 0 0 12px; padding: 0; list-style: none; font-size: 13px; color: var(--stone-dark); }
-  .intro li { padding: 5px 0; border-top: 1px solid var(--rule-light); }
-  .intro li b { color: var(--ink); font-weight: 600; }
-  .intro button { all: unset; cursor: pointer; font: 600 12px var(--sans); background: var(--ink); color: var(--paper); padding: 8px 14px; }
-  .intro button:focus-visible { outline: 2px solid var(--h2); outline-offset: 2px; }
+  .intro .eyebrow { color: var(--accent); }
+  .intro p { margin: 10px 0; font: 400 15px/1.5 var(--sans); }
+  .intro ul { margin: 0 0 12px; padding: 0; list-style: none; font-size: 13px; color: var(--ink-2); }
+  .intro li { padding: 5px 0; border-top: 1px solid var(--rule); }
+  .intro li b { color: var(--ink); font-weight: 500; }
+  .intro button { all: unset; cursor: pointer; font: 500 13px var(--sans); background: var(--ink); color: var(--panel); padding: 8px 14px; }
+  .intro button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   /* ---------- control rail ---------- */
   :root { --rail-h: 200px; }
   .rail { position: absolute; z-index: 5; left: 0; right: 0; bottom: 0; height: var(--rail-h);
           display: grid; grid-template-columns: 268px minmax(0, 1fr) 300px;
-          background: rgba(23,23,22,.94); border-top: 1px solid var(--rule-dark); backdrop-filter: blur(6px); }
+          background: rgba(255,253,249,.96); border-top: 1px solid var(--rule-strong); backdrop-filter: blur(6px); }
   .rail > div { padding: 16px 20px 14px; min-width: 0; }
-  .rail > div + div { border-left: 1px solid var(--rule-dark); }
-  .rail .eyebrow { color: var(--stone); display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .rail > div + div { border-left: 1px solid var(--rule); }
+  .rail .eyebrow { color: var(--ink-3); display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
 
-  .years { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 12px; border: 1px solid var(--rule-dark); }
+  .years { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 12px; border: 1px solid var(--rule-strong); }
   .years button { all: unset; cursor: pointer; padding: 10px 0 9px; text-align: center; position: relative; }
-  .years button + button { border-left: 1px solid var(--rule-dark); }
+  .years button + button { border-left: 1px solid var(--rule); }
   .years .y { display: block; font: 500 15px/1 var(--sans); }
-  .years .p { display: block; font: 400 10.5px/1 var(--mono); color: var(--stone); margin-top: 5px; }
-  .years button[aria-pressed="true"] { background: var(--paper); color: var(--ink); }
-  .years button[aria-pressed="true"] .p { color: var(--stone-dark); }
+  .years .p { display: block; font: 400 10.5px/1 var(--mono); color: var(--ink-3); margin-top: 5px; }
+  .years button[aria-pressed="true"] { background: var(--ink); color: var(--panel); }
+  .years button[aria-pressed="true"] .p { color: #cfc8bd; }
   .years button::after { content: ""; position: absolute; left: 0; bottom: 0; height: 3px; width: 100%; background: var(--c); }
-  .years button:focus-visible { outline: 2px solid var(--h4); outline-offset: -2px; }
-  .play { all: unset; cursor: pointer; margin-top: 12px; font: 500 12px var(--sans); color: var(--h4); display: inline-flex; gap: 8px; align-items: center; }
+  .years button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .play { all: unset; cursor: pointer; margin-top: 12px; font: 500 13px var(--sans); color: var(--accent); display: inline-flex; gap: 8px; align-items: center; }
   .play svg { width: 10px; height: 10px; fill: currentColor; }
-  .play:focus-visible { outline: 2px solid var(--h4); outline-offset: 3px; }
-  .play-note { font-size: 11px; color: var(--stone); margin-top: 4px; }
+  .play:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .play-note { font-size: 11.5px; color: var(--ink-3); margin-top: 4px; }
 
   .hourhead { display: flex; align-items: baseline; gap: 12px; }
-  .hourhead .big { font: 400 26px/1 var(--serif); }
-  .hourhead .sub { color: var(--stone); font-size: 12px; }
-  .chartbox { height: calc(var(--rail-h) - 70px); margin-top: 6px; color: var(--paper); }
+  .hourhead .big { font: 300 26px/1 var(--display); }
+  .hourhead .sub { color: var(--ink-3); font-size: 12px; }
+  .chartbox { height: calc(var(--rail-h) - 70px); margin-top: 6px; }
 
   .readout .qf { display: flex; align-items: baseline; gap: 6px; margin-top: 8px; }
-  .readout .qf .v { font: 400 34px/1 var(--serif); color: var(--h4); }
-  .readout .qf .u { font-size: 12px; color: var(--sand); }
-  .readout .qf .d { margin-left: auto; font: 500 11px var(--mono); color: var(--h3); }
+  .readout .qf .v { font: 300 34px/1 var(--display); color: var(--accent); }
+  .readout .qf .u { font-size: 12px; color: var(--ink-2); }
+  .readout .qf .d { margin-left: auto; font: 500 11px var(--mono); color: var(--accent); }
   .stats { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; font-size: 12px; margin: 12px 0 0; }
-  .stats .k { color: var(--stone); }
+  .stats .k { color: var(--ink-3); }
   .stats .v { text-align: right; }
-  .stats .v small { color: var(--h3); font: 500 10px var(--mono); margin-left: 6px; }
-  .state .legend { width: 320px; max-width: 100%; margin-top: 16px; }
+  .stats .v small { color: var(--accent); font: 500 10px var(--mono); margin-left: 6px; }
+  .state .legend { width: 320px; max-width: 100%; margin-top: 16px; background: rgba(255,253,249,.8); padding: 8px 10px 6px; margin-left: -10px; }
   .legend .bar { display: flex; height: 8px; }
   .legend .bar i { flex: 1; }
-  .legend .ticks { position: relative; height: 14px; font: 400 9.5px var(--mono); color: var(--stone); margin-top: 3px; }
+  .legend .ticks { position: relative; height: 14px; font: 400 9.5px var(--mono); color: var(--ink-3); margin-top: 3px; }
   .legend .ticks span { position: absolute; transform: translateX(-50%); }
-  .legend .unit { font: 400 10px var(--mono); color: var(--stone); margin-top: 1px; }
+  .legend .unit { font: 400 10px var(--mono); color: var(--ink-3); margin-top: 1px; }
 
   /* ---------- inspector ---------- */
-  .inspector { position: absolute; z-index: 6; top: 62px; right: 20px; width: 300px; background: var(--ink-2);
-               border: 1px solid var(--rule-dark); padding: 16px 18px 14px; box-shadow: 0 20px 50px rgba(0,0,0,.5); }
+  .inspector { position: absolute; z-index: 6; top: 62px; right: 20px; width: 300px; background: var(--panel);
+               border: 1px solid var(--rule); padding: 16px 18px 14px; box-shadow: var(--shadow); }
   .inspector[hidden] { display: none; }
-  .inspector .x { all: unset; cursor: pointer; position: absolute; top: 10px; right: 12px; font-size: 18px; color: var(--stone); }
-  .inspector .x:focus-visible { outline: 2px solid var(--h4); }
-  .inspector .eyebrow { color: var(--stone); }
-  .inspector .hv { font: 400 40px/1 var(--serif); margin: 10px 0 2px; color: var(--h4); }
-  .inspector .hv small { font: 400 13px var(--sans); color: var(--sand); }
-  .inspector .hs { font-size: 12px; color: var(--stone); }
-  .inspector h3 { font: 500 10.5px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--stone); margin: 16px 0 8px; }
+  .inspector .x { all: unset; cursor: pointer; position: absolute; top: 10px; right: 12px; font-size: 18px; color: var(--ink-3); }
+  .inspector .x:focus-visible { outline: 2px solid var(--accent); }
+  .inspector .eyebrow { color: var(--ink-3); }
+  .inspector .hv { font: 300 40px/1 var(--display); margin: 10px 0 2px; color: var(--accent); }
+  .inspector .hv small { font: 400 13px var(--sans); color: var(--ink-2); }
+  .inspector .hs { font-size: 12px; color: var(--ink-3); }
+  .inspector h3 { font: 500 10.5px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); margin: 16px 0 8px; }
   .ybars div { display: grid; grid-template-columns: 38px 1fr 54px; align-items: center; gap: 8px; font-size: 12px; padding: 2px 0; }
-  .ybars .track { height: 8px; background: rgba(244,240,232,.06); }
+  .ybars .track { height: 8px; background: rgba(29,27,25,.06); }
   .ybars .fill { height: 100%; transition: width 400ms var(--ease); }
-  .ybars .cur { color: var(--paper); font-weight: 600; }
-  .ybars div:not(.cur) { color: var(--stone); }
+  .ybars .cur { color: var(--ink); font-weight: 500; }
+  .ybars div:not(.cur) { color: var(--ink-3); }
   .ybars .n { text-align: right; }
-  .cellchart { height: 96px; color: var(--paper); }
-  .inspector .ctx { font-size: 11.5px; color: var(--stone); margin-top: 8px; line-height: 1.4; }
+  .cellchart { height: 96px; }
+  .inspector .ctx { font-size: 11.5px; color: var(--ink-2); margin-top: 8px; line-height: 1.4; }
 
   .status-wrap { display: flex; align-items: center; gap: 14px; }
 
@@ -135,13 +134,13 @@
     .mast { padding: 10px 14px; gap: 10px; }
     .crumb, .mast .back { display: none; }
     .status-badge { padding: 5px 7px; font-size: 9.5px; }
-    .state { top: 42px; left: 0; right: 0; padding: 0 14px 10px; background: linear-gradient(180deg, rgba(23,23,22,.9) 70%, rgba(23,23,22,0)); }
+    .state { top: 42px; left: 0; right: 0; padding: 0 14px 10px; background: linear-gradient(180deg, rgba(246,243,238,.95) 70%, rgba(246,243,238,0)); }
     .state h1 { font-size: 24px; margin: 2px 0 8px; }
-    .state .legend { width: 100%; margin-top: 10px; }
+    .state .legend { width: 100%; margin-top: 10px; margin-left: 0; padding: 0; background: none; }
     .infobtn { display: none; }
     .rail { grid-template-columns: 1fr; grid-template-rows: auto 1fr; height: var(--rail-h); }
     .rail > div { padding: 10px 14px; }
-    .rail > div + div { border-left: 0; border-top: 1px solid var(--rule-dark); }
+    .rail > div + div { border-left: 0; border-top: 1px solid var(--rule); }
     .rail .readout { display: none; }
     .years { margin-top: 8px; }
     .play-note { display: none; }
@@ -154,8 +153,8 @@
     .inspector { top: auto; bottom: 0; left: 0; right: 0; width: auto; border-left: 0; border-right: 0; z-index: 7; }
     .mobile-read { display: flex !important; }
   }
-  .mobile-read { display: none; gap: 16px; font-size: 11.5px; color: var(--stone); margin-top: 8px; }
-  .mobile-read b { color: var(--paper); font-weight: 500; }
+  .mobile-read { display: none; gap: 16px; font-size: 11.5px; color: var(--ink-3); margin-top: 8px; }
+  .mobile-read b { color: var(--ink); font-weight: 500; }
 </style>
 </head>
 <body>
@@ -236,7 +235,7 @@
 <script>
 (() => {
   const H = window.HEAT;
-  const OP = 0.88;
+  const OP = 0.92;
   const $ = (id) => document.getElementById(id);
   const S = { yi: 0, hour: H.PEAK, mode: "qf", cell: null, playing: false };
   let SERIES = {}, DIURNAL = null, META = {};
@@ -258,13 +257,13 @@
       version: 8,
       sources: {
         base: { type: "raster", tileSize: 256, maxzoom: 19,
-                tiles: ["a", "b", "c", "d"].map((s) => `https://${s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png`),
+                tiles: ["a", "b", "c", "d"].map((s) => `https://${s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}@2x.png`),
                 attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/attributions">CARTO</a> · footprints GlobalBuildingAtlas' }
       },
       layers: [
-        { id: "bg", type: "background", paint: { "background-color": "#171716" } },
+        { id: "bg", type: "background", paint: { "background-color": "#f6f3ee" } },
         { id: "base", type: "raster", source: "base",
-          paint: { "raster-opacity": 0.62, "raster-saturation": -1, "raster-contrast": 0.1 } }
+          paint: { "raster-opacity": 0.85, "raster-saturation": -1 } }
       ]
     },
     center: [72.88, 19.08], zoom: 10.3,
@@ -294,7 +293,7 @@
   H.YEARS.forEach((y, i) => {
     const b = document.createElement("button");
     b.type = "button"; b.dataset.i = i;
-    b.style.setProperty("--c", H.YEAR_DARK[y]);
+    b.style.setProperty("--c", H.YEAR_LIGHT[y]);
     b.innerHTML = `<span class="y num">${y}</span><span class="p num" data-pen="${y}">–</span>`;
     b.addEventListener("click", () => { stopPlay(); setYear(i, true); });
     $("years").appendChild(b);
@@ -302,22 +301,22 @@
 
   // ---- rail: diurnal chart (map + curve + number move together) ----
   const day = H.diurnal($("dayChart"), {
-    onScrub: (i) => setHour(i), surface: "#171716",
+    onScrub: (i) => setHour(i), surface: "#fffdf9",
     ariaLabel: "City-mean anthropogenic heat by hour for each model year; drag to set the hour",
   });
-  const cellChart = H.diurnal($("cellChart"), { margin: { l: 26, b: 18 }, surface: "#211f1c",
+  const cellChart = H.diurnal($("cellChart"), { margin: { l: 26, b: 18 }, surface: "#fffdf9",
     onScrub: (i) => setHour(i), ariaLabel: "Selected cell, anthropogenic heat by hour" });
 
   function drawDay() {
     if (!DIURNAL) return;
     const series = H.YEARS.map((y) => ({
-      id: y, label: String(y), values: DIURNAL.city_mean[y], color: H.YEAR_DARK[y],
+      id: y, label: String(y), values: DIURNAL.city_mean[y], color: H.YEAR_LIGHT[y],
       width: y === year() ? 2.5 : 1.25, opacity: y === year() ? 1 : 0.4, main: y === year(),
     }));
     // draw selected year last so it sits on top
     series.sort((a, b) => (a.main ? 1 : 0) - (b.main ? 1 : 0));
     day.set({ series, hour: S.hour, yMax: 50,
-              marks: [{ i: H.PEAK, label: "peak", color: "#8f877a", anchor: "end" }] });
+              marks: [{ i: H.PEAK, label: "peak", color: "#7a7369", anchor: "end" }] });
     $("chartYearLbl").textContent = `mapped cells, n = ${DIURNAL.n_cells.toLocaleString("en-IN")}`;
   }
 
@@ -327,7 +326,7 @@
     const segs = ramp.slice(1);
     let bar = "", ticks = "";
     segs.forEach(([v, c], k) => {
-      const c0 = k === 0 ? "#2a1f1b" : segs[k - 1][1];
+      const c0 = k === 0 ? "#fffaf0" : segs[k - 1][1];
       bar += `<i style="background:linear-gradient(90deg,${c0},${c})"></i>`;
       if (k > 0) ticks += `<span style="left:${(k / segs.length) * 100}%">${segs[k - 1][0]}</span>`;
     });
@@ -382,12 +381,12 @@
     const mx = Math.max(1, ...vals);
     $("inspYears").innerHTML = H.YEARS.map((yy, k) => `
       <div class="${yy === y ? "cur" : ""}"><span class="num">${yy}</span>
-      <span class="track"><span class="fill" style="display:block;width:${(vals[k] / mx) * 100}%;background:${H.YEAR_DARK[yy]}"></span></span>
+      <span class="track"><span class="fill" style="display:block;width:${(vals[k] / mx) * 100}%;background:${H.YEAR_LIGHT[yy]}"></span></span>
       <span class="n num">${vals[k].toFixed(1)}</span></div>`).join("");
     const cellDay = Array.from({ length: 24 }, (_, i) => +p[H.field(y, i)] || 0);
     $("inspDayH").textContent = `24 hours in ${y}`;
-    const series = [{ id: "c", label: "this cell", values: cellDay, color: H.YEAR_DARK[y], width: 2, main: true }];
-    if (DIURNAL) series.unshift({ id: "m", label: "city mean", values: DIURNAL.city_mean[y], color: "#8f877a", width: 1.25, dash: "3 3" });
+    const series = [{ id: "c", label: "this cell", values: cellDay, color: H.YEAR_LIGHT[y], width: 2, main: true }];
+    if (DIURNAL) series.unshift({ id: "m", label: "city mean", values: DIURNAL.city_mean[y], color: "#7a7369", width: 1.25, dash: "3 3" });
     cellChart.set({ series, hour: h, yMax: null });
     const cm = DIURNAL ? DIURNAL.city_mean[y][h] : null;
     const add = v - (+p[H.field(2026, h)] || 0);
@@ -476,7 +475,7 @@
                "fill-opacity-transition": { duration: 550, delay: 0 }, "fill-antialias": false }
     }, before));
     map.addSource("sel", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
-    map.addLayer({ id: "sel", type: "line", source: "sel", paint: { "line-color": "#f4f0e8", "line-width": 2 } });
+    map.addLayer({ id: "sel", type: "line", source: "sel", paint: { "line-color": "#1d1b19", "line-width": 2 } });
 
     map.on("click", (e) => {
       const f = map.queryRenderedFeatures(e.point, { layers: [front] })[0];

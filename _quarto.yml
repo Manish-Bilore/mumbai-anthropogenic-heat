@@ -36,7 +36,7 @@ website:
         href: https://github.com/Manish-Bilore/mumbai-anthropogenic-heat
   page-footer:
     left: "Manish Bilore · uncalibrated prototype, September 2026"
-    right: "Code MIT · footprints GlobalBuildingAtlas · basemap © OpenStreetMap"
+    right: "Code MIT · footprints GlobalBuildingAtlas · basemap © OpenStreetMap, © CARTO"
 
 format:
   html:

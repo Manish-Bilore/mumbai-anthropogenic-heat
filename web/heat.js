@@ -10,11 +10,12 @@ window.HEAT = (() => {
   const PEAK = 17; // hour ending 18:00
 
   // Q_f, W/m². Skewed (median ~30, p99 ~150 at peak), so breaks are roughly geometric.
-  const RAMP_QF = [[0, "rgba(23,23,22,0)"], [0.5, "#3a221d"], [5, "#5a2721"], [15, "#8a3024"],
-                   [30, "#c84630"], [50, "#e76f32"], [80, "#f2c14e"], [150, "#fff3cf"]];
+  // Light theme: pale = little waste heat, dark = a lot.
+  const RAMP_QF = [[0, "rgba(246,243,238,0)"], [0.5, "#fdf3d6"], [5, "#fbe3a0"], [15, "#f5c965"],
+                   [30, "#ec9340"], [50, "#d4572e"], [80, "#a8321f"], [150, "#5c1a14"]];
   // ΔQ_f since 2026, W/m²
-  const RAMP_DQ = [[0, "rgba(23,23,22,0)"], [0.25, "#3a221d"], [1, "#5a2721"], [3, "#8a3024"],
-                   [6, "#c84630"], [12, "#e76f32"], [25, "#f2c14e"], [60, "#fff3cf"]];
+  const RAMP_DQ = [[0, "rgba(246,243,238,0)"], [0.25, "#fdf3d6"], [1, "#fbe3a0"], [3, "#f5c965"],
+                   [6, "#ec9340"], [12, "#d4572e"], [25, "#a8321f"], [60, "#5c1a14"]];
 
   function rampExpr(ramp, valueExpr) {
     const e = ["interpolate", ["linear"], valueExpr];
@@ -26,8 +27,8 @@ window.HEAT = (() => {
     ["-", ["coalesce", ["get", field(y, i)], 0], ["coalesce", ["get", field(2026, i)], 0]]);
 
   // Year identity is ordinal, so it borrows the heat ramp: later = hotter.
-  const YEAR_DARK = { 2026: "#a2412c", 2030: "#d65a31", 2035: "#ec8a3a", 2040: "#f2c14e" };
-  const YEAR_LIGHT = { 2026: "#d9a17a", 2030: "#c9683a", 2035: "#a8412a", 2040: "#6e2520" };
+  const YEAR_LIGHT = { 2026: "#e8a55c", 2030: "#d4572e", 2035: "#a8321f", 2040: "#5c1a14" };
+  const YEAR_DARK = YEAR_LIGHT; // kept as an alias; the site is light-themed
 
   const PLACES = [
     // [name, lon, lat, minZoom, kind]
@@ -133,7 +134,7 @@ window.HEAT = (() => {
         g += `<line class="cursor" x1="${cx}" x2="${cx}" y1="${M.t}" y2="${H - M.b}"/>`;
         if (main) {
           const v = main.values[state.hour];
-          g += `<circle cx="${cx}" cy="${y(v)}" r="4.5" fill="${main.color}" stroke="${opts.surface || "#171716"}" stroke-width="2"/>`;
+          g += `<circle cx="${cx}" cy="${y(v)}" r="4.5" fill="${main.color}" stroke="${opts.surface || "#fffdf9"}" stroke-width="2"/>`;
         }
       }
       g += `<rect class="hit" x="${M.l}" y="0" width="${W - M.l - M.r}" height="${H}"/>`;
