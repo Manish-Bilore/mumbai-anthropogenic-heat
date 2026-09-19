@@ -10,12 +10,12 @@ window.HEAT = (() => {
   const PEAK = 17; // hour ending 18:00
 
   // Q_f, W/m². Skewed (median ~30, p99 ~150 at peak), so breaks are roughly geometric.
-  // Light theme: pale = little waste heat, dark = a lot.
-  const RAMP_QF = [[0, "rgba(246,243,238,0)"], [0.5, "#fdf3d6"], [5, "#fbe3a0"], [15, "#f5c965"],
-                   [30, "#ec9340"], [50, "#d4572e"], [80, "#a8321f"], [150, "#5c1a14"]];
+  // Multi-hue, lightness falls steadily: pale lavender-blue (little) → periwinkle → purple → magenta → crimson → deep red (a lot).
+  const RAMP_QF = [[0, "rgba(246,243,238,0)"], [0.5, "#e8e8f4"], [5, "#bcbde9"], [15, "#8c86d6"],
+                   [30, "#8a4fb0"], [50, "#a8367f"], [80, "#b8263f"], [150, "#8c1020"]];
   // ΔQ_f since 2026, W/m²
-  const RAMP_DQ = [[0, "rgba(246,243,238,0)"], [0.25, "#fdf3d6"], [1, "#fbe3a0"], [3, "#f5c965"],
-                   [6, "#ec9340"], [12, "#d4572e"], [25, "#a8321f"], [60, "#5c1a14"]];
+  const RAMP_DQ = [[0, "rgba(246,243,238,0)"], [0.25, "#e8e8f4"], [1, "#bcbde9"], [3, "#8c86d6"],
+                   [6, "#8a4fb0"], [12, "#a8367f"], [25, "#b8263f"], [60, "#8c1020"]];
 
   function rampExpr(ramp, valueExpr) {
     const e = ["interpolate", ["linear"], valueExpr];
@@ -27,7 +27,7 @@ window.HEAT = (() => {
     ["-", ["coalesce", ["get", field(y, i)], 0], ["coalesce", ["get", field(2026, i)], 0]]);
 
   // Year identity is ordinal, so it borrows the heat ramp: later = hotter.
-  const YEAR_LIGHT = { 2026: "#e8a55c", 2030: "#d4572e", 2035: "#a8321f", 2040: "#5c1a14" };
+  const YEAR_LIGHT = { 2026: "#8c86d6", 2030: "#8a4fb0", 2035: "#a8367f", 2040: "#b8263f" };
   const YEAR_DARK = YEAR_LIGHT; // kept as an alias; the site is light-themed
 
   const PLACES = [

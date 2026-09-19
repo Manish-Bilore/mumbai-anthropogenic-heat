@@ -13,13 +13,13 @@
   --rule-strong: rgba(29, 27, 25, 0.28);
 
   /* heat: reserved for Q_f magnitude — light = little, dark = a lot */
-  --h0: #fbecc4;
-  --h1: #f5c965;
-  --h2: #ec9340;
-  --h3: #d4572e;
-  --h4: #a8321f;
-  --h5: #5c1a14;
-  --accent: #b83f24;      /* text-safe heat accent on light (≥ 4.5:1) */
+  --h0: #e8e8f4;          /* pale lavender-blue: little heat */
+  --h1: #bcbde9;
+  --h2: #8c86d6;          /* periwinkle */
+  --h3: #a8367f;          /* magenta */
+  --h4: #b8263f;          /* crimson */
+  --h5: #8c1020;          /* deep red: a lot */
+  --accent: #b0243c;      /* text-safe warm red on light (≥ 4.5:1) */
   --sea: #1f6e6a;
 
   --sans: "Roboto", "Helvetica Neue", Arial, sans-serif;
@@ -44,7 +44,7 @@
   text-decoration: none; white-space: nowrap;
 }
 .status-badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-.status-badge:hover { background: #fbeee6; }
+.status-badge:hover { background: #fbecee; }
 
 .place-label {
   font: 500 10px/1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase;

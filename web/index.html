@@ -326,7 +326,7 @@
     const segs = ramp.slice(1);
     let bar = "", ticks = "";
     segs.forEach(([v, c], k) => {
-      const c0 = k === 0 ? "#fffaf0" : segs[k - 1][1];
+      const c0 = k === 0 ? "#f3f5fb" : segs[k - 1][1];
       bar += `<i style="background:linear-gradient(90deg,${c0},${c})"></i>`;
       if (k > 0) ticks += `<span style="left:${(k / segs.length) * 100}%">${segs[k - 1][0]}</span>`;
     });

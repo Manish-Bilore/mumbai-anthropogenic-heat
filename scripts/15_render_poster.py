@@ -43,8 +43,8 @@ S = 6  # pixels per 100 m cell
 pad = 12
 img = np.zeros(((y1 - y0 + 1 + 2 * pad) * S, (x1 - x0 + 1 + 2 * pad) * S, 3), np.uint8)
 img[:] = (246, 243, 238)  # page background, light theme
-stops = [(0, "#f6f3ee"), (0.5, "#fdf3d6"), (5, "#fbe3a0"), (15, "#f5c965"), (30, "#ec9340"),
-         (50, "#d4572e"), (80, "#a8321f"), (150, "#5c1a14")]  # = RAMP_QF in web/heat.js
+stops = [(0, "#f6f3ee"), (0.5, "#e8e8f4"), (5, "#bcbde9"), (15, "#8c86d6"), (30, "#8a4fb0"),
+         (50, "#a8367f"), (80, "#b8263f"), (150, "#8c1020")]  # = RAMP_QF in web/heat.js
 cmap = LinearSegmentedColormap.from_list("heat", [(v / 150, c) for v, c in stops])
 for (i, j), v in zip(ks, vs):
     if v < 0.5:
