@@ -606,7 +606,7 @@
     <div>
       <h4>Model status</h4>
       <p>Uncalibrated prototype<br />September 2026</p>
-      <p class="soft">Code MIT · footprints GlobalBuildingAtlas (TU Munich) · typology Overture Maps · basemap © OpenStreetMap contributors, © CARTO</p>
+      <p class="soft">Code MIT · footprints GlobalBuildingAtlas (TU Munich) · typology Overture Maps · basemap OpenFreeMap, © OpenMapTiles, © OpenStreetMap contributors</p>
     </div>
   </div>
   <div class="fine"><span>Manish Bilore</span><span>Typical pre-monsoon day · feedback_k = 0.05 K per W/m²</span></div>
@@ -639,19 +639,12 @@
     : { top: 80, bottom: 60, left: Math.min(680, innerWidth * 0.46), right: 390 };
 
   const map = new maplibregl.Map({
-    container: "map", interactive: false, attributionControl: { compact: true },
-    style: {
-      version: 8,
-      sources: { base: { type: "raster", tileSize: 256, maxzoom: 19,
-        tiles: ["a", "b", "c", "d"].map((s) => `https://${s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}@2x.png`),
-        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/attributions">CARTO</a>' } },
-      layers: [
-        { id: "bg", type: "background", paint: { "background-color": "#f6f3ee" } },
-        { id: "base", type: "raster", source: "base", paint: { "raster-opacity": 0.85, "raster-saturation": -1 } },
-      ],
-    },
+    container: "map", interactive: false,
+    attributionControl: { compact: true, customAttribution: H.BASE_ATTRIB },
+    style: H.BASE_STYLE,
     center: [72.88, 19.08], zoom: 10,
   });
+  H.guardBasemap(map);
   map.fitBounds(CITY, { padding: pad("hero"), duration: 0 });
   const places = H.addPlaces(map, maplibregl);
 
@@ -671,6 +664,7 @@
   }
 
   map.on("load", () => {
+    H.prepBase(map);
     map.addSource("qf", { type: "vector", url: "pmtiles://map/tiles/qf_years.pmtiles" });
     ["qfA", "qfB"].forEach((id) => map.addLayer({ id, type: "fill", source: "qf", "source-layer": "qf_years",
       paint: { "fill-color": expr(), "fill-opacity": id === front ? OP : 0,

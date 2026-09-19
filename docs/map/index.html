@@ -253,28 +253,18 @@
   maplibregl.addProtocol("pmtiles", protocol.tile);
   const map = new maplibregl.Map({
     container: "map",
-    style: {
-      version: 8,
-      sources: {
-        base: { type: "raster", tileSize: 256, maxzoom: 19,
-                tiles: ["a", "b", "c", "d"].map((s) => `https://${s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}@2x.png`),
-                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/attributions">CARTO</a> · footprints GlobalBuildingAtlas' }
-      },
-      layers: [
-        { id: "bg", type: "background", paint: { "background-color": "#f6f3ee" } },
-        { id: "base", type: "raster", source: "base",
-          paint: { "raster-opacity": 0.85, "raster-saturation": -1 } }
-      ]
-    },
+    style: H.BASE_STYLE,
     center: [72.88, 19.08], zoom: 10.3,
     maxBounds: [[72.45, 18.7], [73.3, 19.45]],
-    minZoom: 9.5, maxZoom: 16, attributionControl: { compact: true }
+    minZoom: 9.5, maxZoom: 16,
+    attributionControl: { compact: true, customAttribution: H.BASE_ATTRIB + " · footprints GlobalBuildingAtlas" }
   });
   const mobile = matchMedia("(max-width: 860px)").matches;
   map.fitBounds([[72.7779, 18.8937], [72.9793, 19.2691]], { duration: 0,
     padding: mobile ? { top: 120, bottom: 300, left: 10, right: 10 } : { top: 60, bottom: 215, left: 40, right: 40 } });
   map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
   map.on("error", (e) => console.error("maplibre:", e && e.error));
+  H.guardBasemap(map);
   H.addPlaces(map, maplibregl);
 
   let front = "qfA";
@@ -467,6 +457,7 @@
   });
 
   map.on("load", () => {
+    H.prepBase(map);
     map.addSource("qf", { type: "vector", url: "pmtiles://./tiles/qf_years.pmtiles" });
     const before = undefined;
     ["qfA", "qfB"].forEach((id) => map.addLayer({

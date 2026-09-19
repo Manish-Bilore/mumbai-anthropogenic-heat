@@ -17,6 +17,31 @@ window.HEAT = (() => {
   const RAMP_DQ = [[0, "rgba(246,243,238,0)"], [0.25, "#e8e8f4"], [1, "#bcbde9"], [3, "#8c86d6"],
                    [6, "#8a4fb0"], [12, "#a8367f"], [25, "#b8263f"], [60, "#8c1020"]];
 
+  // ---------- basemap: OpenFreeMap Positron (OSM, no API key) ----------
+  const BASE_STYLE = "https://tiles.openfreemap.org/styles/positron";
+  const BASE_ATTRIB = '<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> ' +
+    '<a href="https://www.openmaptiles.org/" target="_blank">© OpenMapTiles</a> ' +
+    'Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>';
+  const FALLBACK_STYLE = { version: 8, sources: {},
+    layers: [{ id: "background", type: "background", paint: { "background-color": "#f6f3ee" } }] };
+
+  // If the basemap style can't be fetched, fall back to a plain background so the heat grid still loads.
+  function guardBasemap(map) {
+    let loaded = false, fell = false;
+    map.once("load", () => { loaded = true; });
+    map.on("error", (e) => {
+      if (loaded || fell || (e && e.sourceId)) return;
+      fell = true;
+      console.warn("basemap unavailable; using plain background", e && e.error);
+      map.setStyle(FALLBACK_STYLE);
+    });
+  }
+  // Drop the basemap's own labels (the site draws its own) and match the page colour.
+  function prepBase(map) {
+    (map.getStyle().layers || []).forEach((l) => { if (l.type === "symbol") map.removeLayer(l.id); });
+    if (map.getLayer("background")) map.setPaintProperty("background", "background-color", "#f6f3ee");
+  }
+
   function rampExpr(ramp, valueExpr) {
     const e = ["interpolate", ["linear"], valueExpr];
     ramp.forEach(([v, c]) => e.push(v, c));
@@ -197,6 +222,6 @@ window.HEAT = (() => {
     return ramp[ramp.length - 1][1];
   }
 
-  return { YEARS, PEAK, pad, field, hourEnd, hourSpan, RAMP_QF, RAMP_DQ, qfExpr, dqExpr,
+  return { BASE_STYLE, BASE_ATTRIB, guardBasemap, prepBase, YEARS, PEAK, pad, field, hourEnd, hourSpan, RAMP_QF, RAMP_DQ, qfExpr, dqExpr,
            YEAR_DARK, YEAR_LIGHT, PLACES, addPlaces, diurnal, tweenNumber, colorAt, reduce };
 })();
