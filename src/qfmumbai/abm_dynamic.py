@@ -129,8 +129,7 @@ def peer_share(ag: Agents, cfg) -> np.ndarray:
 # the decision
 # --------------------------------------------------------------------------
 
-def purchase_probability(ag: Agents, cfg, afford: float, cdh: float,
-                         cdh_ref: float) -> np.ndarray:
+def purchase_probability(ag: Agents, cfg, afford: float, cdh, cdh_ref) -> np.ndarray:
     c = cfg["abm_dynamic"]
     peer = peer_share(ag, cfg)
 
@@ -141,12 +140,12 @@ def purchase_probability(ag: Agents, cfg, afford: float, cdh: float,
 
     u = (float(c["b0"])
          + float(c["b_afford"]) * (afford_i - 1.0)
-         + float(c["b_discomfort"]) * (cdh / cdh_ref - 1.0)
+         + float(c["b_discomfort"]) * (np.asarray(cdh) / cdh_ref - 1.0)
          + float(c["b_peer"]) * peer)
     return float(c["p_cap"]) / (1.0 + np.exp(-u))
 
 
-def step(ag: Agents, cfg, rng, afford: float, cdh: float, cdh_ref: float) -> np.ndarray:
+def step(ag: Agents, cfg, rng, afford: float, cdh, cdh_ref) -> np.ndarray:
     """One year. Mutates ag.adopted, returns the per-building probabilities."""
     p = purchase_probability(ag, cfg, afford, cdh, cdh_ref)
     free = ag.households - ag.adopted
@@ -169,3 +168,8 @@ def stock_saturation(ag: Agents, stock: pd.DataFrame) -> np.ndarray:
     sat = np.zeros(len(stock), dtype=float)
     sat[ag.is_res] = ag.saturation()
     return sat
+
+
+def agent_discomfort(stock_with_thermal: pd.DataFrame, ag: Agents) -> np.ndarray:
+    """Per-agent indoor discomfort degree-hours, aligned to the residential subset."""
+    return stock_with_thermal.loc[ag.is_res, "discomfort_dh"].to_numpy(float)

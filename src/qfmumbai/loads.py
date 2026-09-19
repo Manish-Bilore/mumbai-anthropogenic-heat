@@ -68,11 +68,14 @@ def cooling_demand(df: pd.DataFrame, cfg, weather: pd.DataFrame, ac_fraction: np
     t_out = weather["temp_c"].to_numpy(float)
     if t_out.size != HOURS:
         raise ValueError("weather file must have 24 hourly rows")
-    t_set = float(cfg["cooling"]["setpoint_c"])
     cop = float(cfg["cooling"]["cop"])
+    if "ac_setpoint_c" in df.columns:
+        t_set = df["ac_setpoint_c"].to_numpy(float)[:, None]
+    else:
+        t_set = np.full((len(df), 1), float(cfg["cooling"]["setpoint_c"]))
 
     ua = ua_values(df, cfg)[:, None]                                # (n,1)
-    dT = np.clip(t_out - t_set, 0.0, None)[None, :]                 # (1,24)
+    dT = np.clip(t_out[None, :] - t_set, 0.0, None)                 # (n,24)
 
     solar_density = float(cfg["cooling"]["solar_gain_w_per_m2_floor"])
     day = np.zeros(HOURS); day[7:19] = 1.0
@@ -96,6 +99,9 @@ def cooling_demand(df: pd.DataFrame, cfg, weather: pd.DataFrame, ac_fraction: np
                          cap * np.maximum(units, 1.0),
                          df["floor_area_m2"].to_numpy(float) * 100.0)      # 100 W/m2 installed
     q_cool = np.minimum(q_cool, cap_total[:, None])
+
+    if "ac_runtime_mult" in df.columns:
+        q_cool = q_cool * df["ac_runtime_mult"].to_numpy(float)[:, None]
 
     q_cool = q_cool * ac_fraction[:, None]
     e_ac = q_cool / cop

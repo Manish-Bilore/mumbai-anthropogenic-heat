@@ -173,6 +173,40 @@ vehicles:
 grid:
   cell_m: 100
 
+thermal:
+  comfort_threshold_c: 28.0
+  night_ventilation_factor: 2.5
+  capacitance_j_per_m2k:
+    res_slum:    {value: 45.0e3}
+    res_lowrise: {value: 90.0e3}
+    res_midrise: {value: 130.0e3}
+    res_tower:   {value: 150.0e3}
+    com_retail:  {value: 120.0e3}
+    com_office:  {value: 140.0e3}
+    institutional: {value: 130.0e3}
+    industrial:  {value: 100.0e3}
+  free_running_ach:
+    res_slum:    {value: 3.0}
+    res_lowrise: {value: 5.0}
+    res_midrise: {value: 6.0}
+    res_tower:   {value: 6.0}
+  roof_solar_w_per_m2:
+    res_slum:    {value: 45.0}
+    res_lowrise: {value: 25.0}
+    res_midrise: {value: 6.0}
+    res_tower:   {value: 2.0}
+
+operation:
+  setpoint_by_band: {0: 27.0, 1: 26.0, 2: 25.0, 3: 24.0}
+  bill_sensitivity_by_band: {0: 0.45, 1: 0.65, 2: 0.85, 3: 1.00}
+  runtime_slope: 0.8
+  runtime_midpoint_k: 2.0
+  runtime_floor: 0.15
+
+ensemble:
+  replicates: 30
+  sensitivity_trajectories: 10
+
 abm_dynamic:
   year_start: 2026
   year_end: 2040
