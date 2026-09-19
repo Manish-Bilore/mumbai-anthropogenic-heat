@@ -1,0 +1,76 @@
+---
+title: "Limits"
+subtitle: "What is wrong with this model, in the order it matters"
+---
+
+::: {.caveat}
+Every number on this site comes from a model whose behavioural coefficients are not fitted
+to observation. The physics is real; the trajectory is structural, not predictive.
+:::
+
+## 1. The dominant coefficients are unfitted
+
+Morris screening puts `p_cap` (annual purchase hazard ceiling) and `b0` (baseline
+propensity) at the top of every output. Neither is a measured quantity. Until they are
+calibrated against AC ownership by income band, room-AC sales trends and licensee summer
+load growth, the level of the trajectory is a choice, not a finding. The *shape* — who
+adopts first, where waste heat concentrates, how fabric and income interact — is far more
+robust than the level.
+
+## 2. ΔT is a uniform city-mean increment
+
+The feedback uses a scalar transfer coefficient applied equally to every hour and every
+ward. Real AC waste heat concentrates at night and in dense areas: published coupled
+simulations find little daytime effect and roughly 0.6–1.5 °C of night-time warming where
+cooling is widespread. This model therefore understates night warming in adopting wards and
+overstates daytime warming everywhere. Replacing $k$ with SUEWS or PALM-4U per local
+climate zone is the single largest physics upgrade available.
+
+## 3. Placeholder building parameters
+
+Energy use intensities, appliance stocks, U-values, air change rates, thermal capacitance
+and roof solar gains are all plausible values chosen by hand. No Indian archetype library
+is used. The model was tuned once against city peak electricity (~4,000 MW across the four
+licensees) and left there; further tuning without measured data would be fitting noise.
+
+## 4. Input data limits
+
+**Heights** carry 1.5–9 m error, propagating into floor counts, floor area, capacitance and
+household counts. **Typology** is roughly 35% evidence-supported; the remainder comes from a
+size-and-height heuristic. **The slum layer is 2016** and sets archetype, thermal properties
+and income band simultaneously, so its vintage propagates into all three — Mumbai's informal
+stock has changed since, particularly where redevelopment has occurred. **The income proxy
+is land value.**
+
+## 5. Physics simplifications
+
+- **COP fixed at 3.0.** Real COP degrades as ambient temperature rises, so cooling energy
+  and waste heat are understated exactly when they matter most.
+- **All condenser heat treated as sensible.** Commercial cooling towers reject mostly latent
+  heat; in a coastal, humid city that distinction changes the surface energy balance.
+- **Vehicle heat rests on one invented number** — city-wide daily vehicle-kilometres — yet
+  contributes a large share of total Q~f~. It is the least constrained term in the model.
+- **Solar gain is a flat clear-sky proxy** with no shading, orientation or sky view factor.
+
+## 6. Structural omissions
+
+- **The stock is frozen to 2040**: no redevelopment, no new construction, no population
+  growth. Over fifteen years Mumbai's redevelopment pipeline probably changes cooling demand
+  more than adoption behaviour does.
+- **No daytime population redistribution.** Metabolic heat sits at people's homes all day,
+  understating Q~f~ in BKC, Nariman Point and Lower Parel during working hours and
+  overstating it in the suburbs.
+- **No tenure split.** Renters cannot install, landlords do not pay bills; the split-incentive
+  problem is large in Mumbai's rental and chawl stock.
+- **No tariff slabs.** Maharashtra residential tariffs telescope steeply, so crossing a slab
+  sharply raises marginal cost. Electricity price does not enter the decision at all.
+- **No replacement cycle.** Units are bought and never retired, so efficiency standards
+  cannot be tested.
+- **Commercial and industrial cooling is exogenous** — a fixed fraction per archetype — despite
+  being 43% of modelled energy.
+
+## 7. What is *not* a limitation
+
+**Stochastic uncertainty.** With 3.2 million households, seed variance in 2040 penetration
+is under 0.1 percentage points. Presenting replicate ensembles as uncertainty quantification
+would be misleading; the uncertainty is in the coefficients.

@@ -1,0 +1,81 @@
+---
+title: "Reproduce"
+---
+
+## Environment
+
+```bash
+git clone git@github.com:Manish-Bilore/mumbai-anthropogenic-heat.git
+cd mumbai-anthropogenic-heat
+conda env create -f environment.yml
+conda activate mumbaiqf
+```
+
+NumPy is pinned below 2.0: several compiled dependencies in the geospatial stack are built
+against the 1.x ABI.
+
+## Inputs
+
+Place in `data/raw/` (see [Data](data.qmd) for sources):
+
+`buildings.gpkg`, `mumbai_typology.gpkg`, `wards.gpkg`,
+`mumbai_ward_population_bmc.csv`, `mapped_slums_2016.kml`,
+`mumbai_daily_temperature_1951_2024.csv`, `rr_localities.csv`
+
+## Pipeline
+
+```bash
+python scripts/00a_normalise_ward_population.py       # BMC export -> schema
+python scripts/00b_normalise_inputs.py                # wards, buildings, typology
+python scripts/00c_make_typical_day.py --from-year 2020
+python scripts/08_build_income_proxy.py               # ASR localities -> ward medians
+python scripts/01_prepare_stock.py                    # floors, area, archetype, ward
+python scripts/02_assign_population.py                # households, income band
+python scripts/03_run_loads.py                        # hourly loads + waste heat
+python scripts/04_gridify.py                          # 100 m grid + metabolism + traffic
+python scripts/06_benchmark.py                        # vs Sailor et al.
+python scripts/10_abm_ensemble.py --replicates 3      # the ABM
+python scripts/11_morris_screening.py --trajectories 2
+python scripts/12_export_web_series.py                # web/series.json
+```
+
+Then the map tiles (needs `tippecanoe`):
+
+```bash
+tippecanoe -o web/tiles/qf_years.pmtiles -l qf_years -Z 9 -z 14 \
+  --no-feature-limit --no-tile-size-limit --force \
+  data/processed/qf_grid_years.geojson
+```
+
+Preview locally with a server that honours HTTP Range requests — `python -m http.server`
+does not, and PMTiles will silently fail:
+
+```bash
+cd web && python -m RangeHTTPServer 8000
+```
+
+## Everything is in one file
+
+`config/params.yaml` holds every parameter, tagged `[placeholder]`, `[literature]` or
+`[official]`. Nothing numeric is hardcoded in the modules. The file's hash is written into
+every log line, so any result traces back to the exact parameter set that produced it.
+
+## Runtimes
+
+Measured on a laptop, 580,890 buildings:
+
+| step | time |
+|---|---|
+| stock, population | ~30 s |
+| loads + grid | ~1 min |
+| ABM, 3 replicates | ~5 min |
+| Morris, r = 2 (18 evaluations) | ~11 min |
+| tiling | ~2 min |
+
+## Building this site
+
+```bash
+quarto render          # -> docs/, copies web/ into docs/map/
+```
+
+GitHub Pages serves `docs/` from `main`.

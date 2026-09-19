@@ -1,0 +1,56 @@
+project:
+  type: website
+  output-dir: docs
+  post-render:
+    - bash scripts/13_copy_map.sh
+
+website:
+  title: "Mumbai Anthropogenic Heat"
+  description: "Bottom-up urban building energy model and AC-adoption ABM for Greater Mumbai"
+  site-url: https://manish-bilore.github.io/mumbai-anthropogenic-heat/
+  repo-url: https://github.com/Manish-Bilore/mumbai-anthropogenic-heat
+  repo-actions: [source, issue]
+  page-navigation: true
+  navbar:
+    left:
+      - text: Overview
+        href: index.qmd
+      - text: Method
+        href: method.qmd
+      - text: The ABM
+        href: abm.qmd
+      - text: Results
+        href: results.qmd
+      - text: Map
+        href: map.qmd
+      - text: Data
+        href: data.qmd
+      - text: Limits
+        href: limitations.qmd
+      - text: Reproduce
+        href: reproduce.qmd
+    right:
+      - icon: github
+        href: https://github.com/Manish-Bilore/mumbai-anthropogenic-heat
+  page-footer:
+    left: "Manish Bilore · uncalibrated prototype, September 2026"
+    right: "Code MIT · footprints GlobalBuildingAtlas · basemap © OpenStreetMap"
+
+format:
+  html:
+    theme: [cosmo, styles.scss]
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-tools: true
+    fig-width: 8
+    fig-height: 4
+    df-print: kable
+    link-external-newwindow: true
+
+execute:
+  freeze: auto
+  warning: false
+  echo: false
+
+jupyter: python3

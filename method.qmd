@@ -1,0 +1,122 @@
+---
+title: "Method"
+---
+
+## Chain
+
+```{mermaid}
+flowchart LR
+  A[footprints + heights] --> B[stock: floors, area, archetype]
+  T[Overture typology] --> B
+  S[slum polygons] --> B
+  B --> P[population + households + income band]
+  W[ward population] --> P
+  R[ready reckoner] --> P
+  P --> L[hourly loads]
+  P --> TH[1R1C indoor temperature]
+  TH --> L
+  L --> Q[Qf grid 100 m]
+  M[metabolism] --> Q
+  V[road traffic] --> Q
+  TH --> ABM[household adoption ABM]
+  ABM --> L
+  Q -->|delta T| ABM
+```
+
+## 1. Stock
+
+Floors are `ceil(height / storey height)` with storey height set per use class, clipped to
+[1, 90]. Floor area is footprint × floors. Archetype comes from the Overture-derived
+typology, refined by floor count for residential buildings, and overridden to `res_slum`
+where the centroid falls inside a mapped slum polygon. Wards are joined by centroid, with
+a 100 m snap for near-boundary cases; 92,693 buildings fall outside Greater Mumbai
+altogether (Thane, Mira-Bhayandar, Navi Mumbai) and are dropped.
+
+```{python}
+import geopandas as gpd, pandas as pd
+s = gpd.read_parquet("data/interim/stock.parquet")
+t = (s.groupby("archetype")
+       .agg(buildings=("building_id","size"),
+            floor_area_km2=("floor_area_m2", lambda x: round(x.sum()/1e6,1)),
+            median_floors=("floors","median"),
+            median_height_m=("height_m", lambda x: round(x.median(),1)))
+       .sort_values("buildings", ascending=False))
+t
+```
+
+## 2. Population and income
+
+Ward population (MCGM mid-2023) is distributed across residential floor area within each
+ward, then divided by archetype occupancy to give households. Income band is a quartile of
+the ward's ready-reckoner rate, with slum-flagged buildings pinned to the lowest band —
+land value is a poor income proxy precisely where informal settlements sit inside expensive
+wards.
+
+## 3. Loads and waste heat
+
+$$
+P_\text{base}(t) = \sum_\text{appliances} (\text{ownership} \times \text{rated power}) \times \sigma(t)
+$$
+
+$$
+UA = U A_\text{env} + 0.33\, n_\text{ACH} V
+$$
+
+$$
+Q_\text{cool}(t) = \big[UA \max(0, T_\text{out} - T_\text{set}) + Q_\text{sol} + Q_\text{int}\big] \times \text{occupancy} \times \text{runtime}
+$$
+
+$$
+Q_f(t) = P_\text{base}(t) + Q_\text{cool}(t) + \frac{Q_\text{cool}(t)}{\text{COP}} \equiv P_\text{base} + Q_\text{cool}\left(1 + \tfrac{1}{\text{COP}}\right)
+$$
+
+Base electricity becomes indoor heat and is simultaneously an internal gain to the cooling
+load, so the two terms are physically coupled. Splitting base from cooling is what allows
+adoption to change anything.
+
+Two non-building terms are added at the grid stage: human metabolism (70 W asleep, 140 W
+awake, following the residential occupancy schedule, placed at people's homes) and road
+traffic (city-wide daily vehicle-kilometres distributed across cells by class-weighted OSM
+road length, shaped by a twin-peak traffic profile).
+
+## 4. Indoor temperature (1R1C)
+
+Adoption is driven by discomfort, and discomfort is felt indoors. A single-capacitance
+model per building gives free-running indoor air temperature:
+
+$$
+C \frac{dT_\text{in}}{dt} = UA_\text{eff}\,(T_\text{out} - T_\text{in}) + Q_\text{sol} + Q_\text{int}
+$$
+
+with $C$ = capacitance per m² × floor area, and $UA_\text{eff}$ built from fabric plus
+**open-window** ventilation — not the closed-window ACH used for cooling load — boosted at
+night when outdoor air is cooler. Solar gain includes a roof term that matters only for
+low-rise dwellings, where roof area per dwelling is large. Integrated hourly over a
+repeating typical day with a five-day spin-up.
+
+This is what makes archetypes differ. Without it, every household in the city experiences
+the same stimulus and the building stock does no work.
+
+```{python}
+w = pd.read_csv("data/processed/abm2_thermal_wards.csv")
+agg = (w.assign(hh=w.households)
+        .groupby("income_band")
+        .apply(lambda g: pd.Series({
+            "households": int(g.hh.sum()),
+            "indoor mean °C": round((g.t_in_mean*g.hh).sum()/g.hh.sum(), 1),
+            "indoor max °C": round((g.t_in_max*g.hh).sum()/g.hh.sum(), 1),
+            "discomfort Kh": int((g.discomfort*g.hh).sum()/g.hh.sum()),
+        }), include_groups=False))
+agg
+```
+
+## 5. Feedback
+
+$$
+\Delta T(t+1) = k \big[\overline{Q_f}(t) - \overline{Q_f}(\text{baseline})\big]
+$$
+
+$\Delta T$ raises the next year's outdoor temperature series, which raises both cooling
+demand and indoor discomfort. $k$ is a transfer coefficient standing in for a surface
+energy balance model; it is the largest physics assumption in the project and is swept
+explicitly. See [Limits](limitations.qmd).

@@ -1,0 +1,64 @@
+---
+title: "Data"
+---
+
+## Inputs
+
+| input | source | vintage | note |
+|---|---|---|---|
+| building footprints + heights | GlobalBuildingAtlas (TU Munich, PlanetScope-derived) | 2024 | 673,583 raw; height error 1.5–9 m |
+| building typology | Overture Maps POI matching | 2026 | 12 classes; ~35% evidence-supported, rest heuristic |
+| slum extents | mapped slums (KML) | 2016 | 2,542 polygons, 33.5 km² |
+| ward boundaries | BMC / open data | — | 24 wards |
+| ward population | MCGM civic demographics | mid-2023 | 13,014,389 |
+| income proxy | Maharashtra Annual Statement of Rates via public compilations | 2026–27 | 125 localities → ward medians |
+| weather | daily Tmax/Tmin | 1951–2024 | station era only (2020+) |
+| road network | OpenStreetMap via osmnx | 2026 | 6,157 km |
+
+## Derived stock
+
+```{python}
+import geopandas as gpd, pandas as pd
+s = gpd.read_parquet("data/interim/stock_population.parquet")
+pd.DataFrame({
+    "buildings in Greater Mumbai": [f"{len(s):,}"],
+    "floor area": [f"{s.floor_area_m2.sum()/1e6:.1f} km²"],
+    "households": [f"{s.households.sum()/1e6:.2f} M"],
+    "informal share of buildings": [f"{100*s.is_slum.mean():.1f}%"],
+}).T.rename(columns={0: ""})
+```
+
+## The income proxy
+
+The eASR portal disallows automated access, so ward-level rates were derived from published
+compilations of the same official schedule: 125 revenue-village localities, manually mapped
+to wards with a confidence flag, then taken as a median per ward. The spread is 7.3× from
+M/East (₹53,970/m²) to A ward (₹3,92,624/m²), which is enough to define four meaningful
+income bands.
+
+It remains **land value, not income**. Its worst failure — informal settlements inside
+expensive wards, such as Dharavi in G/North or Behrampada in H/East — is handled by pinning
+slum-flagged buildings to the lowest band regardless of rate.
+
+## The weather record
+
+The daily series splices two sources, visible in the decimal precision: 1951–2019 is a
+gridded product (April–May median Tmax ≈ 35.9 °C, daily range ≈ 12 °C), 2020–2024 is
+station data (34.5 °C, range ≈ 8.5 °C). The gridded era is inland-biased and would
+overstate cooling demand, so only the station era is used. A typical pre-monsoon day is
+taken as the April–May median and expanded to 24 hours with a Parton–Logan curve.
+
+One consequence: a single series means **no urban heat island gradient**. Every ward
+receives identical forcing, and the only spatial variation in indoor temperature comes from
+building fabric.
+
+## Still to acquire
+
+| what | from | unlocks |
+|---|---|---|
+| AC ownership by income | CEEW India Residential Energy Survey, Maharashtra | calibration of the two dominant coefficients |
+| feeder / division load | AEML, BEST, Tata Power, MSEDCL | validation of the 3,064 MW baseline |
+| tariff slabs and time-of-day | MERC orders | electricity price in the adoption and runtime decisions |
+| traffic counts | MMRDA Comprehensive Transportation Study | the vehicle heat term, currently one invented number |
+| current slum extents | own Sentinel-2 classification | replaces the 2016 layer |
+| machine-readable ASR | IGR Maharashtra | replaces hand-transcribed localities |

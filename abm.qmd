@@ -1,0 +1,94 @@
+---
+title: "The agent-based model"
+---
+
+## Why agents
+
+A spreadsheet can multiply an assumed penetration rate by a cooling load. Three things
+here need agents:
+
+**Heterogeneity that interacts with the physics.** The dwelling that gets hottest belongs
+to the household least able to buy cooling. That correlation determines the aggregate, and
+it cannot be recovered from city means.
+
+**Peer effects.** Adoption spreads through neighbourhoods. The share of nearby households
+already owning an AC enters each decision, so adoption compounds spatially instead of
+rising uniformly.
+
+**A feedback loop.** Waste heat raises outdoor temperature, which raises indoor
+temperature, which raises discomfort, which raises adoption. The loop only exists if the
+agents re-read their environment each year.
+
+## Agents
+
+One household cohort per residential building: an integer count of households, of which an
+integer count own an air conditioner. That makes 3.2 million household agents cost two
+integer arrays rather than three million Python objects.
+
+| attribute | source |
+|---|---|
+| households | ward population → residential floor area → archetype occupancy |
+| income band | ready-reckoner quartile, slums pinned to the lowest |
+| archetype | typology + floor count + slum flag |
+| indoor temperature, discomfort | 1R1C model on that building's fabric |
+| AC ownership | state variable, updated annually |
+| setpoint, runtime | chosen from income band and indoor exceedance |
+
+## The decision
+
+Each year, every household without an AC draws against
+
+$$
+u = \beta_0 + \beta_a (\text{afford} - 1) + \beta_d \left(\frac{\text{discomfort}_i}{\text{discomfort}_\text{ref}} - 1\right) + \beta_p\, \text{peer}_i
+$$
+
+$$
+p_i = \frac{p_\text{cap}}{1 + e^{-u}}
+$$
+
+- **afford** rises with real income growth against a falling real AC price, scaled down at
+  low income bands (the same price is a larger barrier further down the distribution).
+- **discomfort~i~** is that agent's own indoor degree-hours above the comfort threshold,
+  including any warming the city has caused itself.
+- **peer~i~** is the share of households owning an AC within the agent's neighbourhood,
+  computed on a 500 m grid with 3×3 smoothing rather than a radius query — the calculation
+  repeats every simulated year over 580,890 buildings.
+
+Adoption is a binomial draw on the non-owning households, so **penetration is an output**.
+Nothing forces the trajectory toward a target.
+
+## Operation
+
+Ownership is a weak proxy for heat output: a household cooling one room for two hours a
+night and one cooling a whole flat for ten differ fourfold. Two behavioural variables
+close that gap.
+
+**Setpoint** falls with income band (27 °C at the bottom, 24 °C at the top).
+**Runtime** is logistic in mean indoor exceedance above the setpoint, damped by a bill
+sensitivity that is lower for poorer households. Both are read back by the load model.
+
+```{python}
+import pandas as pd
+ts = pd.read_csv("data/processed/abm2_timeseries.csv")
+pd.DataFrame({
+  "year": ts.year,
+  "penetration %": (100*ts.pen_med).round(1),
+  "mean runtime": ts.runtime_med.round(2),
+  "Qf mean W/m²": ts.qf_med.round(2),
+  "ΔT °C": ts.dt_med.round(2),
+  "peak MW": ts.elec_med.round(0).astype(int),
+}).set_index("year")
+```
+
+The city-wide mean runtime is where the inequality shows up in aggregate: it dropped from
+0.74 to 0.60 the moment 284,216 buildings were reclassified as informal, because those
+households sit in the highest-setpoint, most bill-sensitive group. Operation behaviour, not
+ownership, did that.
+
+## What the model is not
+
+It has no replacement cycle (units are bought, never retired), no explicit tariff slabs, no
+tenure split between owners and renters, and no change in the building stock — no
+redevelopment, no new construction, no population growth. Commercial and industrial cooling
+is a fixed fraction per archetype and sits outside the ABM entirely, despite being 43% of
+modelled energy.

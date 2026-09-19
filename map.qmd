@@ -1,0 +1,21 @@
+---
+title: "Interactive map"
+page-layout: full
+---
+
+Hourly anthropogenic heat on a 100 m grid, for four snapshot years of the adoption model.
+Drag the year slider to watch waste heat grow as households buy air conditioners; drag the
+hour slider to see the evening peak build. Click any cell for its value across all four
+years.
+
+```{=html}
+<iframe src="map/index.html" style="width:100%; height:78vh; border:1px solid #e6e3dd; border-radius:4px;"></iframe>
+```
+
+[Open the map full screen](map/index.html){target="_blank"}
+
+**Reading it.** The island city and the eastern suburbs carry the highest values; SGNP,
+Aarey and the creeks are empty because no buildings sit there. Cell-level variance is real
+rather than noise — a 100 m cell holding one tower differs sharply from its neighbour
+holding three chawls — but at this resolution the picture is grainier than a published
+Q~f~ atlas would normally be shown.

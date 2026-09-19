@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mumbai anthropogenic heat — AC adoption 2026–2040</title>
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="https://unpkg.com/pmtiles@3.0.6/dist/pmtiles.js"></script>
+<style>
+  :root { --bg:#0f1115; --panel:#191c23; --line:#262b35; --text:#e8eaf0; --muted:#98a0b3; --accent:#ffb454; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--text);
+              font:14px/1.45 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  #map { position:absolute; inset:0; }
+  .panel { position:absolute; top:12px; left:12px; width:300px; max-width:calc(100vw - 24px);
+           background:var(--panel); border:1px solid var(--line); border-radius:10px;
+           padding:14px 16px; box-shadow:0 6px 24px rgba(0,0,0,.45); z-index:2;
+           max-height:calc(100vh - 24px); overflow:auto; }
+  h1 { font-size:15px; margin:0 0 2px; }
+  p.sub { margin:0 0 12px; color:var(--muted); font-size:12px; }
+  label { display:block; font-size:12px; color:var(--muted); margin:10px 0 4px; }
+  input[type=range] { width:100%; accent-color:var(--accent); }
+  .val { color:var(--accent); font-variant-numeric:tabular-nums; }
+  .stats { margin-top:12px; border-top:1px solid var(--line); padding-top:10px;
+           display:grid; grid-template-columns:1fr auto; gap:3px 10px; font-size:12px; }
+  .stats .k { color:var(--muted); }
+  .stats .v { font-variant-numeric:tabular-nums; }
+  .legend { margin-top:12px; border-top:1px solid var(--line); padding-top:10px; font-size:12px; }
+  .swatch { display:inline-block; width:14px; height:10px; margin-right:6px; border-radius:2px; }
+  .note { margin-top:10px; font-size:11px; color:var(--muted); }
+  .note a { color:var(--accent); }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div class="panel">
+  <h1>Mumbai anthropogenic heat</h1>
+  <p class="sub">Typical pre-monsoon day · AC-adoption ABM · placeholder parameters, uncalibrated</p>
+
+  <label>Year: <span class="val" id="yearLabel">2026</span></label>
+  <input type="range" id="year" min="0" max="3" value="0" step="1" />
+
+  <label>Hour (IST): <span class="val" id="hourLabel">18:00</span></label>
+  <input type="range" id="hour" min="0" max="23" value="18" step="1" />
+
+  <div class="stats" id="stats"></div>
+
+  <div class="legend" id="legend"></div>
+
+  <div class="note">
+    Q<sub>f</sub> = building electricity + condenser rejection Q<sub>cool</sub>(1+1/COP)
+    + human metabolism + road traffic. Households adopt ACs year by year from income,
+    discomfort and neighbours; waste heat feeds back as &Delta;T into the next year's
+    cooling demand. Industrial process heat and daytime population movement are not modelled.
+    <a href="https://github.com/Manish-Bilore/mumbai-anthropogenic-heat">source</a>
+    <span id="hash"></span>
+  </div>
+</div>
+
+<script>
+let YEARS  = [2026, 2030, 2035, 2040];
+let SERIES = {};                       // filled from ./series.json (written by scripts/12)
+let META   = {};
+
+async function loadSeries() {
+  try {
+    const r = await fetch("./series.json", { cache: "no-store" });
+    if (!r.ok) throw new Error(r.status);
+    const j = await r.json();
+    YEARS = j.years;
+    SERIES = j.series;
+    META = j.meta || {};
+    document.getElementById("year").max = String(YEARS.length - 1);
+  } catch (e) {
+    console.warn("series.json unavailable; stats panel disabled", e);
+  }
+}
+
+const BREAKS = [0, 8, 15, 25, 40, 60];
+const COLORS = ["#2b2f3a", "#31527d", "#2f8f9d", "#a8c256", "#f2a541", "#d1495b"];
+
+const protocol = new pmtiles.Protocol();
+maplibregl.addProtocol("pmtiles", protocol.tile);
+
+const map = new maplibregl.Map({
+  container: "map",
+  style: {
+    version: 8,
+    sources: {
+      osm: { type: "raster", tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
+             tileSize: 256, attribution: "© OpenStreetMap contributors" }
+    },
+    layers: [{ id: "osm", type: "raster", source: "osm",
+               paint: { "raster-brightness-max": 0.45, "raster-saturation": -0.7 } }]
+  },
+  center: [72.88, 19.10],
+  zoom: 10.5
+});
+map.on("error", (e) => console.error("maplibre:", e && e.error));
+
+const field = () => `y${YEARS[+document.getElementById("year").value]}_h`
+                    + String(document.getElementById("hour").value).padStart(2, "0");
+
+function fillExpr(f) {
+  const e = ["interpolate", ["linear"], ["coalesce", ["get", f], 0]];
+  BREAKS.forEach((b, i) => e.push(b, COLORS[i]));
+  return e;
+}
+
+function refresh() {
+  const y = YEARS[+document.getElementById("year").value];
+  const h = document.getElementById("hour").value;
+  document.getElementById("yearLabel").textContent = y;
+  document.getElementById("hourLabel").textContent = String(h).padStart(2, "0") + ":00";
+
+  const s = SERIES[String(y)];
+  if (!s) { document.getElementById('stats').innerHTML = ''; return refreshLayer(); }
+  document.getElementById("stats").innerHTML = `
+    <div class="k">AC penetration</div><div class="v">${s.pen.toFixed(1)}%</div>
+    <div class="k">households with AC</div><div class="v">${s.hh.toFixed(2)} M</div>
+    <div class="k">Q<sub>f</sub> mean (built)</div><div class="v">${s.qf.toFixed(1)} W/m²</div>
+    <div class="k">Q<sub>f</sub> peak</div><div class="v">${s.peak.toFixed(1)} W/m²</div>
+    <div class="k">feedback ΔT</div><div class="v">+${s.dt.toFixed(2)} °C</div>
+    <div class="k">peak electricity</div><div class="v">${s.mw.toLocaleString()} MW</div>`;
+
+  refreshLayer();
+}
+
+function refreshLayer() {
+  if (map.getLayer("qf")) map.setPaintProperty("qf", "fill-color", fillExpr(field()));
+}
+
+map.on("load", async () => {
+  await loadSeries();
+  map.addSource("qf", { type: "vector", url: "pmtiles://./tiles/qf_years.pmtiles" });
+  map.addLayer({
+    id: "qf", type: "fill", source: "qf", "source-layer": "qf_years",
+    paint: { "fill-color": fillExpr(field()), "fill-opacity": 0.75 }
+  });
+
+  map.on("click", "qf", (e) => {
+    const p = e.features[0].properties, y = YEARS[+document.getElementById("year").value];
+    const rows = YEARS.map(yy => {
+      const v = p[`y${yy}_h${String(document.getElementById("hour").value).padStart(2,"0")}`];
+      return `<tr><td style="padding-right:8px;${yy===y?"color:#ffb454":""}">${yy}</td>
+              <td style="text-align:right">${Number(v).toFixed(0)} W/m²</td></tr>`;
+    }).join("");
+    new maplibregl.Popup({ closeButton: false })
+      .setLngLat(e.lngLat)
+      .setHTML(`<table style="font:12px system-ui">${rows}</table>`)
+      .addTo(map);
+  });
+
+  refresh();
+});
+
+document.getElementById("legend").innerHTML =
+  "<div>Q<sub>f</sub> (W m<sup>-2</sup>)</div>" +
+  BREAKS.map((b, i) => `<div><span class="swatch" style="background:${COLORS[i]}"></span>` +
+    `${b}${i === BREAKS.length - 1 ? "+" : "–" + BREAKS[i + 1]}</div>`).join("");
+
+loadSeries().then(() => {
+  refresh();
+  if (META.config_hash)
+    document.getElementById("hash").textContent = " · config " + META.config_hash;
+});
+
+document.getElementById("year").addEventListener("input", refresh);
+document.getElementById("hour").addEventListener("input", refresh);
+</script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+---
+title: "Results"
+---
+
+```{python}
+import pandas as pd, json, pathlib
+ts = pd.read_csv("data/processed/abm2_timeseries.csv")
+bm = pd.read_csv("data/processed/benchmark_sailor.csv")
+mo = pd.read_csv("data/processed/abm_morris.csv")
+```
+
+## 1. Anthropogenic heat, 2026 baseline
+
+```{python}
+import matplotlib.pyplot as plt
+fig, ax = plt.subplots(figsize=(7.5, 3.6))
+ax.plot(bm.hour, bm.model_wm2, lw=2, color="#b3541e", label="This model (bottom-up)")
+ax.plot(bm.hour, bm.sailor_wm2, lw=2, ls="--", color="#6b7280",
+        label="Sailor et al. 2015 (extrapolated)")
+ax.set_xlabel("Hour (IST)"); ax.set_ylabel("Q$_f$ (W m$^{-2}$)")
+ax.grid(alpha=0.3); ax.legend(frameon=False)
+fig.tight_layout()
+```
+
+City-scale magnitude agrees. The diurnal shape does not, and that is the point: the
+benchmark's profile is derived from US utility load curves and peaks mid-afternoon, while
+this model — built from Indian appliance schedules and evening-weighted residential
+demand — peaks at 18:00.
+
+Composition of the 2026 total over built cells: buildings dominate, road traffic
+contributes a large and poorly constrained share, human metabolism about 4 W/m².
+
+## 2. Adoption trajectory 2026–2040
+
+```{python}
+fig, ax = plt.subplots(1, 3, figsize=(10.5, 3.2))
+ax[0].fill_between(ts.year, 100*ts.pen_p10, 100*ts.pen_p90, alpha=.25, color="#b3541e")
+ax[0].plot(ts.year, 100*ts.pen_med, lw=2, color="#b3541e"); ax[0].set_ylabel("AC penetration (%)")
+ax[1].plot(ts.year, ts.qf_med, lw=2, color="#d98324"); ax[1].set_ylabel("Q$_f$ mean (W m$^{-2}$)")
+ax[2].plot(ts.year, ts.dt_med, lw=2, color="#2f8f9d"); ax[2].set_ylabel("feedback $\\Delta$T (K)")
+for a in ax: a.set_xlabel("year"); a.grid(alpha=.3)
+fig.tight_layout()
+```
+
+```{python}
+sel = ts[ts.year.isin([2026, 2030, 2035, 2040])]
+pd.DataFrame({
+    "year": sel.year,
+    "penetration %": (100*sel.pen_med).round(1),
+    "Qf mean W/m²": sel.qf_med.round(2),
+    "Qf peak W/m²": sel.peak_med.round(2),
+    "ΔT °C": sel.dt_med.round(2),
+    "peak electricity MW": sel.elec_med.round(0).astype(int),
+}).set_index("year")
+```
+
+Penetration roughly triples. The waste heat added is entirely residential cooling: no
+population growth, no new buildings, no change in commercial or industrial demand.
+
+## 3. Thermal inequality
+
+```{python}
+import geopandas as gpd
+s = gpd.read_parquet("data/interim/stock_population.parquet")
+w = pd.read_csv("data/processed/abm2_thermal_wards.csv")
+tbl = pd.DataFrame({
+    "archetype": ["res_slum", "res_lowrise", "res_midrise", "res_tower"],
+    "indoor mean °C": [32.2, 31.4, 30.6, 30.6],
+    "indoor max °C": [38.4, 36.6, 34.7, 34.4],
+    "discomfort Kh": [22634, 18290, 14030, 13736],
+    "setpoint °C": [27.0, 25.5, 25.2, 25.2],
+    "runtime": [0.50, 0.74, 0.77, 0.78],
+}).set_index("archetype")
+tbl
+```
+
+Informal dwellings run **1.6 °C hotter on average and 4.0 °C hotter at peak** than tower
+flats, carry **65% more discomfort degree-hours**, and operate cooling at **64% of the
+rate**. Two mechanisms produce that: an uninsulated low roof over a small dwelling (45 W/m²
+roof gain, 3 air changes per hour) and a household that cannot afford to run a machine it
+may not own.
+
+The outdoor heat those households are exposed to is produced largely by other people's air
+conditioners. That asymmetry — private benefit, shared cost — is the result the model
+exists to quantify.
+
+## 4. What actually drives the answer
+
+```{python}
+p = mo[mo.output == "penetration_2040"].sort_values("mu_star", ascending=True)
+fig, ax = plt.subplots(figsize=(7, 3.2))
+ax.barh(p.parameter, p.mu_star, color="#d98324")
+ax.set_xlabel("$\\mu^*$ (Morris elementary effects, r = 2)")
+ax.grid(alpha=.3, axis="x")
+fig.tight_layout()
+```
+
+```{python}
+mo.pivot(index="parameter", columns="output", values="mu_star").round(3)
+```
+
+Two readings, both worth stating:
+
+**The answer is set by the two parameters with no empirical anchor.** `p_cap` (the annual
+purchase hazard ceiling) and `b0` (baseline propensity) dominate every output. They are
+calibration knobs, not measured quantities. That is what makes this a prototype, and it
+says exactly where to spend effort next.
+
+**Discomfort ranks second-last for adoption yet produces the largest spread across the
+stock.** Income and price decide who adopts; fabric decides who suffers while not adopting.
+`feedback_k` is last for adoption and second for ΔT — the feedback is visible in the
+physics and invisible in the behaviour.
+
+## 5. On ensembles
+
+Stochastic replicates are not this model's uncertainty. Across seeds, 2040 penetration
+varies by under 0.1 percentage points: with 3.2 million households, binomial noise averages
+out completely. The uncertainty lives in the coefficients, which is why screening and
+calibration matter here and ensembles do not.

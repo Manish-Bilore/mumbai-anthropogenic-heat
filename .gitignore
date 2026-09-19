@@ -22,3 +22,8 @@ cache/
 
 # tiles are the site payload
 !web/tiles/*.pmtiles
+
+/.quarto/
+**/*.quarto_ipynb
+web/tiles/
+.quarto/
