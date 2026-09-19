@@ -10,9 +10,16 @@ SAILOR_SUMMER_SHAPE = np.array(
 )
 
 
-def city_profile(grid: pd.DataFrame, prefix: str = "qf_h") -> np.ndarray:
+def city_profile(grid: pd.DataFrame, prefix: str = "qf_h", built_only: bool = True) -> np.ndarray:
+    """Mean Qf profile. built_only excludes cells with no buildings (sea, park,
+    creek) - Sailor's city-scale value is over built land, so this matters."""
     cols = [f"{prefix}{h:02d}" for h in range(24)]
-    return grid[cols].mean(axis=0).to_numpy()
+    df = grid[cols]
+    if built_only:
+        mask = grid["has_building"] if "has_building" in grid.columns \
+               else df.abs().sum(axis=1) > 0.01
+        df = df[mask]
+    return df.mean(axis=0).to_numpy()
 
 
 def compare(grid: pd.DataFrame, cfg) -> pd.DataFrame:
@@ -28,9 +35,11 @@ def compare(grid: pd.DataFrame, cfg) -> pd.DataFrame:
 
 
 def summary(grid: pd.DataFrame, cfg) -> dict:
-    model = city_profile(grid)
+    model = city_profile(grid, built_only=True)
+    all_cells = city_profile(grid, built_only=False)
     return {
         "model_mean_wm2": float(model.mean()),
+        "model_mean_wm2_all_cells": float(all_cells.mean()),
         "model_peak_wm2": float(model.max()),
         "model_peak_hour": int(model.argmax() + 1),
         "sailor_mean_wm2": float(cfg["benchmark"]["sailor_summer_mean_wm2"]),

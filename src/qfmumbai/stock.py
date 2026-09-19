@@ -5,6 +5,8 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 
+SNAP_M = 100.0   # snap near-boundary buildings to the nearest ward
+
 
 def _floor_height(cfg, use_class: str) -> float:
     fh = cfg["stock"]["floor_height_m"]
@@ -47,7 +49,19 @@ def prepare_stock(buildings: gpd.GeoDataFrame, wards: gpd.GeoDataFrame, cfg) -> 
     cent = gdf.copy()
     cent["geometry"] = gdf.geometry.centroid
     joined = gpd.sjoin(cent, wards, how="left", predicate="within")[["building_id", "ward"]]
-    gdf = gdf.merge(joined.drop_duplicates("building_id"), on="building_id", how="left")
+    joined = joined.drop_duplicates("building_id")
+
+    miss = joined["ward"].isna()
+    if miss.any():
+        ids = joined.loc[miss, "building_id"]
+        near = gpd.sjoin_nearest(cent[cent.building_id.isin(ids)][["building_id", "geometry"]],
+                                 wards, how="left", max_distance=SNAP_M, distance_col="_d")
+        near = near.drop_duplicates("building_id")[["building_id", "ward"]]
+        joined = joined.set_index("building_id")
+        joined.update(near.set_index("building_id"))
+        joined = joined.reset_index()
+
+    gdf = gdf.merge(joined, on="building_id", how="left")
 
     keep = ["building_id", "ward", "use_class", "archetype", "is_residential", "is_slum",
             "height_m", "floors", "footprint_m2", "floor_area_m2", "geometry"]

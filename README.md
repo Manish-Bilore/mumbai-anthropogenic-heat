@@ -100,9 +100,13 @@ The expected difference is shape: Indian residential demand peaks in the evening
 6. **All condenser heat is treated as sensible.** Commercial cooling towers reject mostly latent heat.
 7. **No feedback.** Q_f does not raise air temperature here. Literature puts AC-driven
    nighttime warming at roughly 0.6–1.5 °C; closing the loop needs SUEWS or PALM-4U.
-8. **Omitted:** vehicles, human metabolism, industrial process heat, daytime population
+8. **Weather record splices two sources.** 1951-2019 is a gridded product
+   (Tmax ~35.9 C, DTR ~12 C in April-May); 2020-2024 is station data
+   (34.5 C, DTR ~8.5 C). Only the station era is used. A single series means
+   no urban heat island gradient: every ward gets identical forcing.
+9. **Omitted:** vehicles, human metabolism, industrial process heat, daytime population
    redistribution, spatial weather variation.
-9. **ABM is uncalibrated.** No observed AC ownership data has been fitted.
+10. **ABM is uncalibrated.** No observed AC ownership data has been fitted.
 
 ---
 

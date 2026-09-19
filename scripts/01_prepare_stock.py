@@ -15,9 +15,16 @@ def main():
     log.info("read %d buildings, %d wards", len(buildings), len(wards))
 
     stock = prepare_stock(buildings, wards, cfg)
-    unmatched = stock["ward"].isna().sum()
-    if unmatched:
-        log.warning("%d buildings fell outside all ward polygons", unmatched)
+    unmatched = stock["ward"].isna()
+    if unmatched.any():
+        out_of_scope = stock[unmatched]
+        log.warning("dropping %d buildings outside Greater Mumbai (%.1f%% of stock)",
+                    int(unmatched.sum()), 100 * unmatched.mean())
+        log.warning("their bbox (working CRS): %s",
+                    [round(v) for v in out_of_scope.total_bounds])
+        out_of_scope[["building_id", "geometry"]].to_parquet(
+            cfg.path("stock").parent / "buildings_out_of_scope.parquet")
+        stock = stock[~unmatched].copy()
 
     log.info("archetype counts:\n%s", stock["archetype"].value_counts().to_string())
     log.info("total floor area: %.2f km2", stock["floor_area_m2"].sum() / 1e6)

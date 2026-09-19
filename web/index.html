@@ -4,9 +4,9 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Mumbai anthropogenic heat — demo</title>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.min.css" rel="stylesheet" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pmtiles/3.0.6/index.js"></script>
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="https://unpkg.com/pmtiles@3.0.6/dist/pmtiles.js"></script>
 <style>
   :root { --bg:#0f1115; --panel:#191c23; --text:#e8eaf0; --muted:#98a0b3; --accent:#ffb454; }
   html,body { margin:0; height:100%; background:var(--bg); color:var(--text);
@@ -45,7 +45,7 @@
 <script>
 const PEN_LEVELS = ["p10", "p25", "p40", "p60", "p90"];
 const PEN_TEXT   = ["10%", "25%", "40%", "60%", "90%"];
-const BREAKS = [0, 5, 10, 20, 40, 80];
+const BREAKS = [0, 8, 15, 25, 40, 60];
 const COLORS = ["#2b2f3a", "#31527d", "#2f8f9d", "#a8c256", "#f2a541", "#d1495b"];
 
 const protocol = new pmtiles.Protocol();
@@ -85,6 +85,8 @@ function refresh() {
     map.setPaintProperty("qf", "fill-color", fillExpression(currentField()));
   }
 }
+
+map.on("error", (e) => console.error("maplibre error:", e && e.error));
 
 map.on("load", () => {
   map.addSource("qf", { type: "vector", url: "pmtiles://./tiles/qf_grid.pmtiles" });

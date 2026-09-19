@@ -4,10 +4,12 @@ import numpy as np
 import pandas as pd
 
 from qfmumbai.abm import adopt
-from qfmumbai.config import Config
+from qfmumbai.config import Config, ROOT, ROOT
 from qfmumbai.gridify import aggregate, make_grid
 from qfmumbai.io_utils import read_vector, write_vector
 from qfmumbai.loads import assemble
+from qfmumbai.qf_other import metabolic_heat, vehicle_heat
+from qfmumbai.qf_other import metabolic_heat, vehicle_heat
 from qfmumbai.logging_utils import get_logger
 
 
@@ -29,11 +31,22 @@ def main():
 
         tmp = stock.copy()
         # adopted buildings run their income-band saturation; others none
-        tmp["ac_saturation_base"] = np.where(adopted == 1, tmp["ac_saturation_base"], 0.0)
+        tmp["ac_saturation_base"] = np.where(adopted == 1, 1.0, 0.0)
         res = assemble(tmp, cfg, weather, penetration=None)
 
         tag = f"p{int(level * 100):02d}"
-        g = aggregate(stock, res["qf_w"], grid, prefix=f"{tag}_h")
+        qf = res["qf_w"] + metabolic_heat(stock, cfg)
+        g = aggregate(stock, qf, grid, prefix=f"{tag}_h")
+
+        roads_path = ROOT / cfg.get_in("vehicles.roads_file", "")
+        if roads_path.exists():
+            import geopandas as gpd
+            veh = vehicle_heat(g, gpd.read_file(roads_path), cfg)
+            hc = [f"{tag}_h{h:02d}" for h in range(24)]
+            for i, c in enumerate(hc):
+                g[c] = g[c] + veh[:, i]
+            g["qf_mean"] = g[hc].mean(axis=1)
+            g["qf_peak"] = g[hc].max(axis=1)
         cols = [c for c in g.columns if c.startswith(tag)] + ["qf_mean", "qf_peak"]
         g = g.rename(columns={"qf_mean": f"{tag}_mean", "qf_peak": f"{tag}_peak"})
         merged = merged.merge(
