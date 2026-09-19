@@ -10,7 +10,7 @@ window.HEAT = (() => {
   const PEAK = 17; // hour ending 18:00
 
   // Q_f, W/m². Skewed (median ~30, p99 ~150 at peak), so breaks are roughly geometric.
-  // Multi-hue, lightness falls steadily: pale lavender-blue (little) → periwinkle → purple → magenta → crimson → deep red (a lot).
+  // Multi-hue, lightness falls steadily: pale lavender-blue (little), periwinkle, purple, magenta, crimson, deep red (a lot).
   const RAMP_QF = [[0, "rgba(246,243,238,0)"], [0.5, "#e8e8f4"], [5, "#bcbde9"], [15, "#8c86d6"],
                    [30, "#8a4fb0"], [50, "#a8367f"], [80, "#b8263f"], [150, "#8c1020"]];
   // ΔQ_f since 2026, W/m²

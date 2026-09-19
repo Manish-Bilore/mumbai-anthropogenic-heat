@@ -165,7 +165,7 @@
   <span class="crumb eyebrow">/ Explore the grid</span>
   <span class="sp"></span>
   <div class="status-wrap">
-    <a class="back" href="../">← Read the story</a>
+    <a class="back" href="../">Read the story</a>
     <a class="status-badge" href="../limitations.html" title="Behavioural coefficients are not fitted to observation. Read the limits.">Uncalibrated prototype</a>
   </div>
 </header>
@@ -187,8 +187,8 @@
   <div class="eyebrow" id="introH">What you're seeing</div>
   <p>Each square is a 100 × 100 m cell. Its colour is the anthropogenic heat flux, Q<sub>f</sub>: the waste heat that buildings, air conditioners, people and traffic release into the outdoor air.</p>
   <ul>
-    <li><b>Brighter = more waste heat</b>, in watts per square metre of ground.</li>
-    <li><b>Year</b> steps the adoption model: households buy ACs 2026 → 2040.</li>
+    <li><b>Darker = more waste heat</b>, from pale lavender through purple to deep red, in watts per square metre of ground.</li>
+    <li><b>Year</b> steps the adoption model: households buy ACs from 2026 to 2040.</li>
     <li><b>Hour</b> — drag the curve. The city peaks in the hour ending 18:00.</li>
     <li><b>Click a cell</b> for its value across years and hours.</li>
     <li>Empty areas (SGNP, Aarey, creeks) have no buildings.</li>
@@ -214,7 +214,7 @@
     <div class="years" id="years"></div>
     <div>
       <button type="button" class="play" id="play" aria-pressed="false">
-        <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 0l9 5-9 5z" /></svg><span>Run 2026 → 2040</span>
+        <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 0l9 5-9 5z" /></svg><span>Run 2026–2040</span>
       </button>
       <div class="play-note">Steps the adoption model; only the heat layer changes.</div>
     </div>
@@ -412,12 +412,12 @@
   }
   document.querySelectorAll(".modes button").forEach((b) => b.addEventListener("click", () => setMode(b.dataset.mode)));
 
-  // ---- play: 2026 → 2040, one model step at a time ----
+  // ---- play: 2026 to 2040, one model step at a time ----
   let timer = null;
   function stopPlay() {
     clearTimeout(timer); S.playing = false;
     $("play").setAttribute("aria-pressed", "false");
-    $("play").querySelector("span").textContent = "Run 2026 → 2040";
+    $("play").querySelector("span").textContent = "Run 2026–2040";
     $("play").querySelector("path").setAttribute("d", "M1 0l9 5-9 5z");
   }
   function startPlay() {

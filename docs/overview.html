@@ -221,16 +221,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Every air conditioner moves heat from inside a building to the street. As Mumbai’s households buy them, the city’s waste heat rises — and the households least able to afford cooling live in the dwellings that get hottest.</p>
 <p>This project quantifies both halves of that sentence for all 580,890 buildings inside the 24 BMC wards.</p>
 </div>
-<p><a href="index.html" class="story-link">← The visual story</a> &nbsp; <a href="map/index.html" class="story-link">Explore the map →</a></p>
-<div id="7bac4640" class="cell" data-execution_count="1">
+<p><a href="index.html" class="story-link">The visual story</a> &nbsp; <a href="map/index.html" class="story-link">Explore the map</a></p>
+<div id="a01fe49f" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 
 <div class="keynum">
   <div><div class="v">20.58 W/m²</div><div class="k">Q<sub>f</sub> mean over built cells, 2026</div></div>
-  <div><div class="v">17.9% → 56.2%</div><div class="k">AC penetration, 2026 → 2040</div></div>
+  <div><div class="v">56.2%</div><div class="k">AC penetration by 2040, from 17.9% in 2026</div></div>
   <div><div class="v">23.81 W/m²</div><div class="k">Q<sub>f</sub> mean, 2040</div></div>
   <div><div class="v">+0.15 °C</div><div class="k">waste-heat feedback by 2040</div></div>
-  <div><div class="v">3,064 → 3,516 MW</div><div class="k">peak electricity</div></div>
+  <div><div class="v">3,516 MW</div><div class="k">peak electricity by 2040, from 3,064 MW</div></div>
 </div>
 </div>
 </div>
@@ -731,7 +731,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>the 24 BMC wards.</span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">← The visual story</span><span class="co">](index.html)</span>{.story-link} <span class="dv">&amp;nbsp;</span> <span class="co">[</span><span class="ot">Explore the map →</span><span class="co">](map/index.html)</span>{.story-link}</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">The visual story</span><span class="co">](index.html)</span>{.story-link} <span class="dv">&amp;nbsp;</span> <span class="co">[</span><span class="ot">Explore the map</span><span class="co">](map/index.html)</span>{.story-link}</span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json, pathlib</span>
@@ -741,10 +741,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>HTML(<span class="ss">f"""</span></span>
 <span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="ss">&lt;div class="keynum"&gt;</span></span>
 <span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="ss">  &lt;div&gt;&lt;div class="v"&gt;</span><span class="sc">{</span>a[<span class="st">'qf'</span>]<span class="sc">}</span><span class="ss"> W/m²&lt;/div&gt;&lt;div class="k"&gt;Q&lt;sub&gt;f&lt;/sub&gt; mean over built cells, 2026&lt;/div&gt;&lt;/div&gt;</span></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="ss">  &lt;div&gt;&lt;div class="v"&gt;</span><span class="sc">{</span>a[<span class="st">'pen'</span>]<span class="sc">}</span><span class="ss">% → </span><span class="sc">{</span>b[<span class="st">'pen'</span>]<span class="sc">}</span><span class="ss">%&lt;/div&gt;&lt;div class="k"&gt;AC penetration, 2026 → 2040&lt;/div&gt;&lt;/div&gt;</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="ss">  &lt;div&gt;&lt;div class="v"&gt;</span><span class="sc">{</span>b[<span class="st">'pen'</span>]<span class="sc">}</span><span class="ss">%&lt;/div&gt;&lt;div class="k"&gt;AC penetration by 2040, from </span><span class="sc">{</span>a[<span class="st">'pen'</span>]<span class="sc">}</span><span class="ss">% in 2026&lt;/div&gt;&lt;/div&gt;</span></span>
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="ss">  &lt;div&gt;&lt;div class="v"&gt;</span><span class="sc">{</span>b[<span class="st">'qf'</span>]<span class="sc">}</span><span class="ss"> W/m²&lt;/div&gt;&lt;div class="k"&gt;Q&lt;sub&gt;f&lt;/sub&gt; mean, 2040&lt;/div&gt;&lt;/div&gt;</span></span>
 <span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="ss">  &lt;div&gt;&lt;div class="v"&gt;+</span><span class="sc">{</span>b[<span class="st">'dt'</span>]<span class="sc">}</span><span class="ss"> °C&lt;/div&gt;&lt;div class="k"&gt;waste-heat feedback by 2040&lt;/div&gt;&lt;/div&gt;</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="ss">  &lt;div&gt;&lt;div class="v"&gt;</span><span class="sc">{</span>a[<span class="st">'mw'</span>]<span class="sc">:,}</span><span class="ss"> → </span><span class="sc">{</span>b[<span class="st">'mw'</span>]<span class="sc">:,}</span><span class="ss"> MW&lt;/div&gt;&lt;div class="k"&gt;peak electricity&lt;/div&gt;&lt;/div&gt;</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="ss">  &lt;div&gt;&lt;div class="v"&gt;</span><span class="sc">{</span>b[<span class="st">'mw'</span>]<span class="sc">:,}</span><span class="ss"> MW&lt;/div&gt;&lt;div class="k"&gt;peak electricity by 2040, from </span><span class="sc">{</span>a[<span class="st">'mw'</span>]<span class="sc">:,}</span><span class="ss"> MW&lt;/div&gt;&lt;/div&gt;</span></span>
 <span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="ss">&lt;/div&gt;"""</span>)</span>
 <span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>

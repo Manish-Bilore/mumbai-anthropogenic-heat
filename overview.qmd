@@ -13,7 +13,7 @@ This project quantifies both halves of that sentence for all 580,890 buildings i
 the 24 BMC wards.
 :::
 
-[← The visual story](index.html){.story-link} &nbsp; [Explore the map →](map/index.html){.story-link}
+[The visual story](index.html){.story-link} &nbsp; [Explore the map](map/index.html){.story-link}
 
 ```{python}
 import json, pathlib
@@ -23,10 +23,10 @@ from IPython.display import HTML
 HTML(f"""
 <div class="keynum">
   <div><div class="v">{a['qf']} W/m²</div><div class="k">Q<sub>f</sub> mean over built cells, 2026</div></div>
-  <div><div class="v">{a['pen']}% → {b['pen']}%</div><div class="k">AC penetration, 2026 → 2040</div></div>
+  <div><div class="v">{b['pen']}%</div><div class="k">AC penetration by 2040, from {a['pen']}% in 2026</div></div>
   <div><div class="v">{b['qf']} W/m²</div><div class="k">Q<sub>f</sub> mean, 2040</div></div>
   <div><div class="v">+{b['dt']} °C</div><div class="k">waste-heat feedback by 2040</div></div>
-  <div><div class="v">{a['mw']:,} → {b['mw']:,} MW</div><div class="k">peak electricity</div></div>
+  <div><div class="v">{b['mw']:,} MW</div><div class="k">peak electricity by 2040, from {a['mw']:,} MW</div></div>
 </div>""")
 ```
 

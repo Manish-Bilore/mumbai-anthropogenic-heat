@@ -106,7 +106,7 @@
   .keyline > div { padding: 14px 14px 0 0; }
   .keyline > div + div { padding-left: 14px; border-left: 1px solid var(--rule); }
   .keyline .v { font: 300 23px/1 var(--display); white-space: nowrap; }
-  .keyline .v .to { color: var(--ink-3); font-size: .7em; margin: 0 4px; }
+  .keyline .v .u { color: var(--ink-3); font-size: .62em; }
   .keyline .v b { font-weight: 500; color: var(--accent); }
   .keyline .k { font: 400 11.5px/1.35 var(--sans); color: var(--ink-3); margin-top: 6px; }
   .byline { margin-top: 28px; font: 400 13px var(--sans); color: var(--ink-3); display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
@@ -353,14 +353,14 @@
     <!-- hero -->
     <div class="step hero" data-step="hero">
       <div class="hero-in">
-        <div class="eyebrow">Greater Mumbai · 24 BMC wards · 2026 → 2040</div>
+        <div class="eyebrow">Greater Mumbai · 24 BMC wards · 2026–2040</div>
         <h1>Every air conditioner moves heat from inside a building <em>to the street.</em></h1>
         <p class="dek">As Mumbai's households buy them, the city's waste heat rises — and the households least able to afford cooling live in the dwellings that get hottest. This model quantifies both halves of that sentence for all 580,890 buildings.</p>
         <div class="keyline">
-          <div><div class="v num"><span data-k="qf26">20.58</span><span class="to">→</span><b data-k="qf40">23.81</b></div><div class="k">W/m² Q<sub>f</sub>, mean over built cells</div></div>
-          <div><div class="v num"><span data-k="pen26">17.9</span>%<span class="to">→</span><b data-k="pen40">56.2</b>%</div><div class="k">AC penetration</div></div>
-          <div><div class="v num"><b>+<span data-k="dt40">0.15</span></b> °C</div><div class="k">waste-heat feedback by 2040</div></div>
-          <div><div class="v num"><span data-k="mw26">3,064</span><span class="to">→</span><b data-k="mw40">3,516</b></div><div class="k">MW peak electricity</div></div>
+          <div><div class="v num"><b data-k="qf40">23.81</b> <span class="u">W/m²</span></div><div class="k">Q<sub>f</sub> over built cells by 2040, from <span data-k="qf26">20.58</span> in 2026</div></div>
+          <div><div class="v num"><b data-k="pen40">56.2</b><span class="u">%</span></div><div class="k">AC penetration by 2040, from <span data-k="pen26">17.9</span>% in 2026</div></div>
+          <div><div class="v num"><b>+<span data-k="dt40">0.15</span></b> <span class="u">°C</span></div><div class="k">waste-heat feedback by 2040</div></div>
+          <div><div class="v num"><b data-k="mw40">3,516</b> <span class="u">MW</span></div><div class="k">peak electricity by 2040, from <span data-k="mw26">3,064</span> MW</div></div>
         </div>
         <div class="byline"><span>Manish Bilore · September 2026</span><a class="status-badge" href="#limits">Uncalibrated prototype</a></div>
         <div class="cue">Scroll — the map follows the model ↓</div>
@@ -422,7 +422,7 @@
         <div class="eyebrow">Mumbai, 2040 · hour ending 18:00</div>
         <h2>Every cell, every hour, every model year.</h2>
         <p>The full map lets you drag through the day, run the adoption model, and open any 100 m cell for its values across all four years.</p>
-        <a class="cta" href="map/#y=2040&h=18">Open the map →</a>
+        <a class="cta" href="map/#y=2040&h=18">Open the map</a>
       </div>
     </div>
   </div>
@@ -481,7 +481,7 @@
         <button type="button" class="node" data-node="stock"><span class="n">Input</span><span class="t">Building stock</span><span class="val num">580,890</span></button>
         <div class="arrow" aria-hidden="true">↓</div>
         <button type="button" class="node" data-node="pop"><span class="n">Input</span><span class="t">Households &amp; income</span><span class="val num">3.22 M</span></button>
-        <div class="arrow" aria-hidden="true"><span class="ad">→</span><span class="am">↓</span></div>
+        <div class="arrow" aria-hidden="true"><span class="am">↓</span></div>
       </div>
 
       <div>
@@ -497,7 +497,7 @@
           </svg>
           <button type="button" class="node p0" data-node="thermal"><span class="n">1R1C</span><span class="t">Indoor discomfort</span><span class="val num" id="lvThermal">per dwelling</span></button>
           <button type="button" class="node p1" data-node="abm"><span class="n">ABM</span><span class="t">Household buys an AC?</span><span class="val num" id="lvPen">17.9%</span></button>
-          <button type="button" class="node p2" data-node="loads"><span class="n">UBEM</span><span class="t">Hourly loads → Q<sub>f</sub></span><span class="val num" id="lvQf">20.58 W/m²</span></button>
+          <button type="button" class="node p2" data-node="loads"><span class="n">UBEM</span><span class="t">Hourly loads and Q<sub>f</sub></span><span class="val num" id="lvQf">20.58 W/m²</span></button>
           <button type="button" class="node p3" data-node="feedback"><span class="n">Feedback</span><span class="t">City warms by ΔT</span><span class="val num" id="lvDt">+0.00 °C</span></button>
           <div class="mid"><div class="y num" id="lvYear">2026</div><div class="l">model year</div></div>
         </div>
@@ -561,7 +561,7 @@
       <li><b>The stock is frozen to 2040:</b> no redevelopment, no new construction, no population growth.</li>
       <li><b>No daytime population redistribution:</b> metabolic heat stays at home, understating BKC, Nariman Point and Lower Parel by day.</li>
     </ol>
-    <p style="margin-top:32px"><a class="more" href="limitations.html">Full limits, in the order they matter →</a></p>
+    <p style="margin-top:32px"><a class="more" href="limitations.html">Full limits, in the order they matter</a></p>
   </div>
 </section>
 
@@ -571,8 +571,8 @@
     <div class="txt">
       <div class="eyebrow" style="color:var(--accent)">Explore</div>
       <h2>Open the city <em>cell by cell.</em></h2>
-      <p>Hourly anthropogenic heat on a 100 m grid for four snapshot years of the adoption model. Drag the day, run 2026 → 2040, click any cell for its value across every year.</p>
-      <span class="go">Open the full map →</span>
+      <p>Hourly anthropogenic heat on a 100 m grid for four snapshot years of the adoption model. Drag through the day, run the model from 2026 to 2040, and click any cell for its value across every year.</p>
+      <span class="go">Open the full map</span>
     </div>
     <figure class="poster"><img src="map/poster.png" alt="Anthropogenic heat across Greater Mumbai in 2040, hour ending 18:00, each 100 m cell coloured from dark red to pale yellow" loading="lazy" width="1410" height="2634" /><figcaption>2040 · hour ending 18:00 · each pixel block is one 100 m cell</figcaption></figure>
   </a>
@@ -697,7 +697,7 @@
   function hud() {
     $("hudWhen").innerHTML = M.mode === "qf"
       ? `<small>Q<sub>f</sub> · 100 m grid</small><em>${M.year}</em> · hour ending ${H.hourEnd(M.hour)}`
-      : `<small>Added by adoption · 100 m grid</small>2026 → <em>${M.year}</em> · ${H.hourEnd(M.hour)}`;
+      : `<small>Added since 2026 · 100 m grid</small><em>${M.year}</em> · hour ending ${H.hourEnd(M.hour)}`;
     if (!DIURNAL) return;
     const on = chartMode !== "none";
     $("hudChart").classList.toggle("on", on); $("hudKey").classList.toggle("on", on);
@@ -899,7 +899,7 @@
     b_peer:        { d: "neighbour influence", anchor: true, v: { delta_t_2040: 0.050, penetration_2040: 0.089, qf_2040_wm2: 0.678 } },
     b_afford:      { d: "weight on affordability", anchor: true, v: { delta_t_2040: 0.079, penetration_2040: 0.074, qf_2040_wm2: 0.794 } },
     b_discomfort:  { d: "weight on indoor discomfort", anchor: true, v: { delta_t_2040: 0.044, penetration_2040: 0.067, qf_2040_wm2: 0.501 } },
-    feedback_k:    { d: "waste heat → ΔT, K per W/m²", anchor: true, v: { delta_t_2040: 0.282, penetration_2040: 0.008, qf_2040_wm2: 0.320 } },
+    feedback_k:    { d: "waste heat to ΔT, K per W/m²", anchor: true, v: { delta_t_2040: 0.282, penetration_2040: 0.008, qf_2040_wm2: 0.320 } },
   };
   const UNITS = { penetration_2040: "μ* in penetration (fraction)", delta_t_2040: "μ* in K", qf_2040_wm2: "μ* in W/m²" };
   const ROW = 44;
