@@ -173,6 +173,27 @@ vehicles:
 grid:
   cell_m: 100
 
+abm_dynamic:
+  year_start: 2026
+  year_end: 2040
+  snapshot_years: [2026, 2030, 2035, 2040]
+  cooling_season_days: 210          # [placeholder]
+
+  # decision coefficients (UNCALIBRATED)
+  p_cap: 0.28
+  b0: -2.2
+  b_afford: 1.8
+  b_discomfort: 1.2
+  b_peer: 1.6
+  afford_low_band: 0.35
+  peer_cell_m: 500
+
+  income_growth_pa: 0.05            # [placeholder]
+  ac_price_decline_pa: 0.02         # [placeholder]
+
+  feedback_k: 0.05                  # K per W/m2  [BIGGEST ASSUMPTION]
+  feedback_k_sensitivity: [0.0, 0.02, 0.05, 0.08]
+
 benchmark:
   # Sailor et al. 2015 extrapolation for Mumbai (city scale, fec=0.08, 2010 IEA)
   sailor_summer_peak_wm2: 40.07       # [literature]

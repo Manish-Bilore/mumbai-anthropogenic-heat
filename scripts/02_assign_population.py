@@ -24,8 +24,12 @@ def main():
         log.warning("no ready-reckoner file; falling back to dwelling-area proxy for income")
 
     out = assign_population(stock, ward_pop, cfg)
-    log.info("allocated population: %.0f (ward input total %.0f)",
-             out["population"].sum(), ward_pop["population_mid2023"].sum())
+    alloc, target = out["population"].sum(), ward_pop["population_mid2023"].sum()
+    log.info("allocated population: %.0f (ward input total %.0f)", alloc, target)
+    if target > 0 and alloc < 0.9 * target:
+        missing = sorted(set(stock["ward"].dropna().unique()) - set(ward_pop["ward"]))
+        raise ValueError(f"only {100*alloc/target:.1f}% of population allocated - "
+                         f"ward codes likely mismatched. In stock not in population file: {missing[:10]}")
     log.info("households: %.0f | mean AC saturation (hh-weighted): %.3f",
              out["households"].sum(),
              (out["ac_saturation_base"] * out["households"]).sum() / max(out["households"].sum(), 1))

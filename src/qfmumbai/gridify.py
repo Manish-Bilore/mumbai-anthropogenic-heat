@@ -46,3 +46,26 @@ def aggregate(stock: gpd.GeoDataFrame, values_w: np.ndarray, grid: gpd.GeoDataFr
     out["qf_peak"] = out[hcols].max(axis=1)
     out["peak_hour"] = out[hcols].values.argmax(axis=1)
     return out
+
+
+def assign_cells(stock: gpd.GeoDataFrame, grid: gpd.GeoDataFrame) -> np.ndarray:
+    """Building -> cell_id, computed once and reused across simulated years."""
+    pts = stock.copy()
+    pts["geometry"] = stock.geometry.centroid
+    joined = gpd.sjoin(pts[["geometry"]], grid[["cell_id", "geometry"]],
+                       how="left", predicate="within")
+    return joined["cell_id"].to_numpy()
+
+
+def aggregate_fast(cell_ids: np.ndarray, values_w: np.ndarray, grid: gpd.GeoDataFrame,
+                   prefix: str = "qf_h") -> pd.DataFrame:
+    """Same as aggregate() but takes precomputed cell ids (no spatial join)."""
+    df = pd.DataFrame(values_w, columns=[f"{prefix}{h:02d}" for h in range(HOURS)])
+    df["cell_id"] = cell_ids
+    summed = df.groupby("cell_id", dropna=True).sum()
+
+    cell_area = grid.geometry.area.iloc[0]
+    out = grid[["cell_id"]].merge(summed, on="cell_id", how="left").fillna(0.0)
+    for h in range(HOURS):
+        out[f"{prefix}{h:02d}"] = out[f"{prefix}{h:02d}"] / cell_area
+    return out

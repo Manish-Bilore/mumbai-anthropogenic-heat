@@ -8,3 +8,17 @@ data/processed/*
 logs/*.log
 web/tiles/*.pmtiles
 .ipynb_checkpoints/
+cache/
+
+# keep small derived inputs
+!data/raw/mumbai_ward_population_2023.csv
+!data/raw/mumbai_ward_population_bmc.csv
+!data/raw/ready_reckoner.csv
+!data/raw/rr_localities.csv
+!data/raw/weather_typical_day.csv
+!data/processed/abm_timeseries.csv
+!data/processed/abm_sensitivity.csv
+!data/processed/benchmark_sailor.csv
+
+# tiles are the site payload
+!web/tiles/*.pmtiles

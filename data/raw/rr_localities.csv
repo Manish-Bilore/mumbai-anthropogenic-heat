@@ -1,0 +1,126 @@
+locality,region,res_rate_sqft,res_rate_sqm,ward,ward_confidence,source
+Malabar Hill & Cumballa Hill,Central,66354,714228,D,high,stocklens_ASR2026
+Colaba,South,42944,462245,A,high,stocklens_ASR2026
+Bandra C,West,42866,461405,H/W,med,stocklens_ASR2026
+Juhu,West,37466,403280,K/W,high,stocklens_ASR2026
+Bandra G,West,37256,401020,H/W,med,stocklens_ASR2026
+Worli,Central,36443,392269,G/S,high,stocklens_ASR2026
+Bandra D,West,35473,381828,H/W,med,stocklens_ASR2026
+Bandra E,West,32828,353357,H/W,med,stocklens_ASR2026
+Bandra B,West,32217,346781,H/W,med,stocklens_ASR2026
+Bandra F,West,31062,334348,H/W,med,stocklens_ASR2026
+Lower Parel,Central,30886,332454,G/S,high,stocklens_ASR2026
+Fort,Central,30008,323003,A,high,stocklens_ASR2026
+Mahim,Central,28697,308892,G/N,high,stocklens_ASR2026
+Bandra A,West,27453,295501,H/W,med,stocklens_ASR2026
+Vile Parle West,West,27357,294468,K/W,high,stocklens_ASR2026
+Powai,East,26413,284307,S,high,stocklens_ASR2026
+Tardeo,Central,26256,282617,D,high,stocklens_ASR2026
+Matunga,Central,24933,268376,F/N,high,stocklens_ASR2026
+Bandra H,West,23783,255998,H/W,med,stocklens_ASR2026
+Girgaon,Central,22977,247322,D,high,stocklens_ASR2026
+Sion,Central,22461,241768,F/N,high,stocklens_ASR2026
+Versova,West,22152,238442,K/W,high,stocklens_ASR2026
+Vile Parle East,West,22059,237441,K/E,high,stocklens_ASR2026
+Deonar,East,21244,228668,M/E,high,stocklens_ASR2026
+Parel-Sewri,Central,21073,226828,F/S,high,stocklens_ASR2026
+Bandra I,West,20814,224040,H/W,med,stocklens_ASR2026
+Ambivli,West,19970,214955,K/W,med,stocklens_ASR2026
+Tungwa,East,19908,214288,S,med,stocklens_ASR2026
+Oshiwara,West,19580,210757,K/W,high,stocklens_ASR2026
+Wadwali,East,19531,210230,S,low,stocklens_ASR2026
+Andheri,West,19394,208755,K/W,high,stocklens_ASR2026
+Dadar-Naigaum,Central,19315,207905,G/N,high,stocklens_ASR2026
+Pari Ghakhadi,West,19214,206818,H/W,low,stocklens_ASR2026
+Bandra East,West,18555,199724,H/E,high,stocklens_ASR2026
+Tirandaz,East,18534,199498,S,med,stocklens_ASR2026
+Byculla,Central,18297,196947,E,high,stocklens_ASR2026
+Kole Kalyan,West,18165,195526,H/E,med,stocklens_ASR2026
+Bhuleshwar,Central,17804,191640,C,high,stocklens_ASR2026
+Kopri,East,17761,191178,S,low,stocklens_ASR2026
+Chandivali,East,17677,190273,L,med,stocklens_ASR2026
+Chakala,West,17619,189649,K/E,high,stocklens_ASR2026
+Mulgaon,West,17138,184472,K/E,low,stocklens_ASR2026
+Valnai,North,16952,182470,P/N,low,stocklens_ASR2026
+Princess Dock,Central,16918,182104,B,med,stocklens_ASR2026
+Gundavli,West,16910,182018,K/E,high,stocklens_ASR2026
+Poisar,North,16518,177798,R/S,med,stocklens_ASR2026
+Pahadi-Goregaon West,North,16399,176517,P/S,high,stocklens_ASR2026
+Mandapeshwar,North,16221,174601,R/N,high,stocklens_ASR2026
+Marol,West,16197,174343,K/E,high,stocklens_ASR2026
+Brahmanwada,West,16190,174268,K/E,low,stocklens_ASR2026
+Goregaon,North,16082,173105,P/S,high,stocklens_ASR2026
+Kanjur,East,15971,171910,S,high,stocklens_ASR2026
+Sahar,West,15781,169865,K/E,high,stocklens_ASR2026
+Dindoshi,North,15496,166797,P/S,high,stocklens_ASR2026
+Ismailia,West,15484,166668,K/W,low,stocklens_ASR2026
+Shimpvali,North,15408,165850,R/C,low,stocklens_ASR2026
+Mandvi,Central,15345,165172,B,high,stocklens_ASR2026
+Pahadi-Goregaon East,North,15319,164892,P/S,high,stocklens_ASR2026
+Vadhwan,North,15318,164881,P/N,low,stocklens_ASR2026
+Kondivita,West,15306,164752,K/E,high,stocklens_ASR2026
+Chembur,East,15292,164602,M/W,high,stocklens_ASR2026
+Hariyali,East,15176,163353,S,med,stocklens_ASR2026
+Ghatkopar,East,15097,162503,N,high,stocklens_ASR2026
+Akurli,North,15010,161566,R/S,high,stocklens_ASR2026
+Ghatkopar Kirol,East,14947,160888,N,high,stocklens_ASR2026
+Pahadi-Eksar,North,14862,159973,R/C,med,stocklens_ASR2026
+Vikhroli,East,14810,159413,S,high,stocklens_ASR2026
+Mogra,West,14763,158907,K/E,med,stocklens_ASR2026
+Kandivali,North,14665,157853,R/S,high,stocklens_ASR2026
+Magathane,North,14625,157422,R/C,med,stocklens_ASR2026
+Mazgaon,Central,14625,157422,E,high,stocklens_ASR2026
+Chinchavli,North,14480,155861,R/C,low,stocklens_ASR2026
+Borla,East,14478,155840,M/W,med,stocklens_ASR2026
+Kirol,East,14374,154720,N,med,stocklens_ASR2026
+Eksar,North,14196,152804,R/C,high,stocklens_ASR2026
+Charkop,North,14166,152481,R/S,high,stocklens_ASR2026
+Mulund West - Kurla,Outskirts,14093,151696,T,high,stocklens_ASR2026
+Majas Part 1,Outskirts,13925,149887,K/E,low,stocklens_ASR2026
+Majas Part 3,Outskirts,13925,149887,K/E,low,stocklens_ASR2026
+Nahur - Kurla,Outskirts,13871,149306,S,med,stocklens_ASR2026
+Borivali,North,13807,148617,R/C,high,stocklens_ASR2026
+Malad South,North,13743,147928,P/N,high,stocklens_ASR2026
+Malad North,North,13711,147584,P/N,high,stocklens_ASR2026
+Bhandup - Kurla,Outskirts,13660,147035,S,high,stocklens_ASR2026
+Mulund East - Kurla,Outskirts,13625,146658,T,high,stocklens_ASR2026
+Vyarvali,West,13614,146540,K/E,low,stocklens_ASR2026
+Mohili,East,13492,145227,L,med,stocklens_ASR2026
+Majas Part 2,Outskirts,12833,138133,K/E,low,stocklens_ASR2026
+Kurla 3,East,12792,137692,L,high,stocklens_ASR2026
+Malad East,North,12595,135571,P/N,high,stocklens_ASR2026
+Kaneri,North,12491,134452,P/N,low,stocklens_ASR2026
+Erangal,North,12277,132148,P/N,med,stocklens_ASR2026
+Salt Pan,East,12172,131018,F/N,low,stocklens_ASR2026
+Dahisar,North,11907,128166,R/N,high,stocklens_ASR2026
+Kurla 4,East,11748,126454,L,high,stocklens_ASR2026
+Saki,East,11402,122730,L,med,stocklens_ASR2026
+Bandivli,West,11343,122095,K/W,low,stocklens_ASR2026
+Asalfe,East,11171,120244,N,med,stocklens_ASR2026
+Kurar,North,10732,115518,P/N,med,stocklens_ASR2026
+Malwani,North,10357,111482,P/N,high,stocklens_ASR2026
+Bapnala,West,10251,110341,P/N,low,stocklens_ASR2026
+Dharavi,Central,9825,105755,G/N,high,stocklens_ASR2026
+Anik,East,9622,103570,M/W,med,stocklens_ASR2026
+Kurla 2,East,9381,100976,L,high,stocklens_ASR2026
+Maroshi-Borivali,Outskirts,8934,96165,R/C,low,stocklens_ASR2026
+Marwali,East,8483,91310,M/E,low,stocklens_ASR2026
+Kurla 1,East,8369,90083,L,high,stocklens_ASR2026
+Parjapur,West,7934,85401,P/N,low,stocklens_ASR2026
+Madh,West,6971,75035,P/N,high,stocklens_ASR2026
+Paspoli,East,6336,68200,S,med,stocklens_ASR2026
+Mankhurd,East,5753,61925,M/E,high,stocklens_ASR2026
+Marve,North,5374,57845,P/N,med,stocklens_ASR2026
+Mahul,East,5125,55165,M/W,high,stocklens_ASR2026
+Sai,North,5063,54498,R/C,low,stocklens_ASR2026
+Mandale,East,5014,53970,M/E,high,stocklens_ASR2026
+Turbhe,East,4980,53604,M/E,med,stocklens_ASR2026
+Aarey,North,4977,53572,P/S,med,stocklens_ASR2026
+Akse,North,4936,53131,P/N,med,stocklens_ASR2026
+Klerabad,North,4885,52582,R/C,low,stocklens_ASR2026
+Gundgaon,North,4864,52356,R/C,low,stocklens_ASR2026
+Gorai,North,4693,50515,R/C,high,stocklens_ASR2026
+Manori,North,4643,49977,R/C,high,stocklens_ASR2026
+Manbudruk,East,4578,49277,M/E,low,stocklens_ASR2026
+Nanole,East,4537,48836,M/E,low,stocklens_ASR2026
+Darvali,North,4513,48577,R/C,low,stocklens_ASR2026
